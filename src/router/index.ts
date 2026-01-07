@@ -3,10 +3,6 @@ import { createRouter, createWebHistory } from 'vue-router'
 const routes = [
   {
     path: '/',
-    redirect: '/files'
-  },
-  {
-    path: '/files',
     component: () => import("@/views/FileList.vue")
   }
 ]
