@@ -5,7 +5,7 @@
       <div class="icon flex_center" @click="layoutStore.toggleSidebar">
         <Menu/>
       </div>
-      <div class="icon flex_center">
+      <div class="icon flex_center" @click="layoutStore.refreshContent">
         <RefreshRight />
       </div>
     </div>

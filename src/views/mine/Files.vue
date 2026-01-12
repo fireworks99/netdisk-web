@@ -1,22 +1,20 @@
 <template>
-  <el-upload
-    action=""
-    :http-request="handleUpload"
-    :show-file-list="false"
-  >
-    <el-button type="primary">上传文件</el-button>
-  </el-upload>
+  <div class="files_wrapper">
+    <el-upload action="" :http-request="handleUpload" :show-file-list="false">
+      <el-button type="primary">上传文件</el-button>
+    </el-upload>
 
-  <el-table :data="files" style="margin-top: 20px">
-    <el-table-column prop="originalName" label="文件名" />
-    <el-table-column prop="fileSize" label="大小" />
-    <el-table-column prop="createTime" label="上传时间" />
-    <el-table-column label="操作">
-      <template #default="{ row }">
-        <el-button size="small" @click="download(row.id)">下载</el-button>
-      </template>
-    </el-table-column>
-  </el-table>
+    <el-table :data="files" style="margin-top: 20px">
+      <el-table-column prop="originalName" label="文件名" />
+      <el-table-column prop="fileSize" label="大小" />
+      <el-table-column prop="createTime" label="上传时间" />
+      <el-table-column label="操作">
+        <template #default="{ row }">
+          <el-button size="small" @click="download(row.id)">下载</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+  </div>
 </template>
 
 <script setup lang="ts">

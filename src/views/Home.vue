@@ -1,14 +1,18 @@
 <template>
   <div class="home_wrapper">
-    
+
     <Sidebar />
-    
+
     <div class="main">
       <div class="header">
         <Header />
       </div>
       <div class="content">
-        <router-view />
+        <router-view v-slot="{ Component }">
+          <transition name="fade-slide" mode="out-in">
+            <component :is="Component" :key="layoutStore.refreshKey" />
+          </transition>
+        </router-view>
       </div>
     </div>
 
@@ -18,6 +22,9 @@
 <script setup lang="ts">
 import Sidebar from '@/components/Sidebar.vue';
 import Header from '@/components/Header.vue';
+import { useLayoutStore } from '@/store/layout';
+
+const layoutStore = useLayoutStore();
 </script>
 
 <style lang="scss" scoped>
