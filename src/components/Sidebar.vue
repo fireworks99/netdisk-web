@@ -1,5 +1,5 @@
 <template>
-  <div class="sidebar_wrapper">
+  <div :class="['sidebar_wrapper', { collapse: layoutStore.sidebarCollapsed }]">
 
     <div class="header flex_center" @click="$router.push('/')">
       <div class="icon flex_center">
@@ -56,11 +56,14 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-
 import { routes } from '@/router';
+import { useLayoutStore } from '@/store/layout';
 
 const openeds = ref(['/mine', '/user', '/sys']);
 
+// -------------------------- Sidebar切换 start  ------------------------
+const layoutStore = useLayoutStore();
+// -------------------------- Sidebar切换 end  --------------------------
 
 </script>
 
@@ -68,6 +71,13 @@ const openeds = ref(['/mine', '/user', '/sys']);
 .sidebar_wrapper {
   height: 100%;
   border-right: $border-std;
+  width: $sidebar-width;
+  transition: width .15s ease;
+  
+  &.collapse {
+    width: 0;
+    overflow: hidden;
+  }
 
   .header {
     height: $header-height;
@@ -77,6 +87,10 @@ const openeds = ref(['/mine', '/user', '/sys']);
     .text {
       font-size: 18px;
       font-weight: bold;
+
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
     }
   }
 

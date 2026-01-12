@@ -1,9 +1,7 @@
 <template>
   <div class="home_wrapper">
     
-    <div class="sidebar">
-      <Sidebar />
-    </div>
+    <Sidebar />
     
     <div class="main">
       <div class="header">
@@ -27,11 +25,6 @@ import Header from '@/components/Header.vue';
   height: 100%;
   display: flex;
 
-  .sidebar {
-    width: $sidebar-width;
-    // background-color: #6cf;
-  }
-
   .main {
     height: 100%;
     flex: 1;
@@ -39,7 +32,6 @@ import Header from '@/components/Header.vue';
 
     .header {
       height: $header-height;
-      // background-color: #bfa;
       border-bottom: $border-std;
     }
 

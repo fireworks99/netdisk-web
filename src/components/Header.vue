@@ -1,7 +1,14 @@
 <template>
   <div class="header_wrapper">
 
-    <div class="left"></div>
+    <div class="left flex_center">
+      <div class="icon flex_center" @click="layoutStore.toggleSidebar">
+        <Menu/>
+      </div>
+      <div class="icon flex_center">
+        <RefreshRight />
+      </div>
+    </div>
     <div class="middle">{{ clcokText }}</div>
     <div class="right"></div>
 
@@ -11,10 +18,13 @@
 <script setup lang="ts">
 // 组件
 import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { useLayoutStore } from '@/store/layout';
 
 // 工具
 import dayjs from 'dayjs';
 
+
+// -------------------------- 时钟 start  ------------------------
 const clcokText = ref("");
 const _timer = ref<number | null>(null);
 
@@ -38,9 +48,11 @@ onBeforeUnmount(() => {
     _timer.value = null;
   }
 })
+// -------------------------- 时钟 end  --------------------------
 
-
-
+// -------------------------- Sidebar切换 start  ------------------------
+const layoutStore = useLayoutStore();
+// -------------------------- Sidebar切换 end  --------------------------
 
 </script>
 
@@ -50,6 +62,25 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
+
+  .left {
+    height: 100%;
+    margin-left: 16px;
+
+    .icon {
+      width: 32px;
+      height: 32px;
+      padding: 8px;
+      color: $secondary-text-color;
+      border-radius: 8px;
+      cursor: pointer;
+
+      &:hover {
+        color: hsl(240 6% 10%);
+        background-color: hsl(240 5% 96%);
+      }
+    }
+  }
 
   .middle {
     color: $secondary-text-color;
