@@ -2,12 +2,19 @@
   <div class="header_wrapper">
 
     <div class="left flex_center">
+
       <div class="icon flex_center" @click="layoutStore.toggleSidebar">
-        <Menu/>
+        <Menu />
       </div>
+
       <div class="icon flex_center" @click="layoutStore.refreshContent">
         <RefreshRight />
       </div>
+
+      <div class="bread_wrapper">
+        <Breadcrumb />
+      </div>
+
     </div>
     <div class="middle">{{ clcokText }}</div>
     <div class="right"></div>
@@ -19,6 +26,7 @@
 // 组件
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { useLayoutStore } from '@/store/layout';
+import Breadcrumb from './Breadcrumb.vue';
 
 // 工具
 import dayjs from 'dayjs';
@@ -79,6 +87,10 @@ const layoutStore = useLayoutStore();
         color: hsl(240 6% 10%);
         background-color: hsl(240 5% 96%);
       }
+    }
+
+    .bread_wrapper {
+      margin-left: 8px;
     }
   }
 
