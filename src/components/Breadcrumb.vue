@@ -12,15 +12,25 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, watch } from 'vue';
 import { useRoute } from 'vue-router';
+import { useLayoutStore } from '@/store/layout';
 
 const route = useRoute();
-
 const breadcrumbList = computed(() => {
   return route.matched.filter(item => item.meta && item.meta.title);
 });
 
+// 路有变化时，若为移动端，关闭Sidebar
+const layoutStore = useLayoutStore();
+watch(
+  () => route.fullPath,
+  () => {
+    if (layoutStore.isMobile) {
+      layoutStore.closeSidebar();
+    }
+  }
+)
 </script>
 
 <style lang="scss" scoped>

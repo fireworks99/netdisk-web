@@ -4,4 +4,13 @@ body {
     border-right: none;
   }
 
+
+  // 移动端
+  #app.mobile {
+
+    .el-drawer__body {
+      padding: 0;
+    }
+
+  }
 }

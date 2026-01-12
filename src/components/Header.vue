@@ -16,7 +16,7 @@
       </div>
 
     </div>
-    <div class="middle">{{ clcokText }}</div>
+    <div class="middle" v-if="!layoutStore.isMobile">{{ clcokText }}</div>
     <div class="right"></div>
 
   </div>

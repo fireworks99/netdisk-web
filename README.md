@@ -52,4 +52,6 @@
 
     * 从路由中取出路径，渲染在组件中
 
-    
+  * 移动端适配
+    * 添加isMobile状态（方便组件v-if渲染），#app挂载mobile/pc类（单独写样式）
+    * sidebarCollapsed改成sidebarOpened，方便抽屉的v-model直接绑定

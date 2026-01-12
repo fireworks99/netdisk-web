@@ -1,7 +1,13 @@
 <template>
   <div class="home_wrapper">
 
-    <Sidebar />
+    <div v-if="!layoutStore.isMobile">
+      <Sidebar />
+    </div>
+    <el-drawer v-else v-model="layoutStore.sidebarOpened" :with-header="false" 
+      size="200" direction="ltr">
+      <Sidebar />
+    </el-drawer>
 
     <div class="main">
       <div class="header">

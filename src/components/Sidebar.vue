@@ -1,5 +1,5 @@
 <template>
-  <div :class="['sidebar_wrapper', { collapse: layoutStore.sidebarCollapsed }]">
+  <div :class="['sidebar_wrapper', { collapse: !layoutStore.sidebarOpened }]">
 
     <div class="header flex_center" @click="$router.push('/')">
       <div class="icon flex_center">
@@ -98,5 +98,11 @@ const layoutStore = useLayoutStore();
     height: calc(100% - $header-height);
   }
 
+}
+
+#app.mobile {
+  .sidebar_wrapper {
+    border-right: none;
+  }
 }
 </style>

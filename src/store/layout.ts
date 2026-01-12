@@ -2,15 +2,23 @@ import { defineStore } from "pinia";
 
 export const useLayoutStore = defineStore('layout', {
   state: () => ({
-    sidebarCollapsed: false,
-    refreshKey: 0
+    sidebarOpened: false,
+    refreshKey: 0,
+    isMobile: false
   }),
   actions: {
     toggleSidebar() {
-      this.sidebarCollapsed = !this.sidebarCollapsed;
+      this.sidebarOpened = !this.sidebarOpened;
+    },
+    closeSidebar() {
+      this.sidebarOpened = false;
     },
     refreshContent() {
       this.refreshKey++;
+    },
+    setIsMobile(val: boolean) {
+      this.isMobile = val;
+      !val && (this.sidebarOpened = true);
     }
   }
 })
