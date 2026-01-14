@@ -31,7 +31,6 @@
     * 引入sass，定义变量，编写全局样式
     * 引入dayjs，处理日期时间
     * 全局支持variables.scss
-
 * 2026-01-08
 
   * Sidebar由路由渲染
@@ -39,7 +38,6 @@
     * @/router/index.ts里定义路由并导出
     * Sidebar导入路由并渲染
     * 引入el-scrollbar（灵活的滚动条）
-
 * 2026-01-12
 
   * Sidebar可隐藏/显示
@@ -65,3 +63,5 @@
   * 前端调用后端接口
     * 添加config.json(运行时配置)并在启动前加载
     * window.APP_CONFIG做类型声明
+    * 封装axios实例，定义请求拦截器（mock数据）、响应拦截器（统一错误处理）
+  * 
