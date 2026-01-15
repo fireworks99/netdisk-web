@@ -62,24 +62,25 @@ service.interceptors.response.use(
     }
 
     // 未设置状态码则默认成功状态
-    const code = res.data.code || 200;
+    const code = res.data && res.data.code || 200;
     // 获取错误信息
     const msg = res.data.msg || errorCode[code] || errorCode['default'];
     
     
-    // 二进制数据则直接返回
+    // 二进制数据(保留headers)
     if (res.request.responseType === 'blob' || res.request.responseType === 'arraybuffer') {
-      return res.data;
+      return res;
     }
-    //未认证，跳转登录
-    if (code === 401) {
-      return Promise.reject('无效的会话，或者会话已过期，请重新登录。');
+    
+    if (code === 401) {//未认证，跳转登录
+      ElMessage({ message: '无效的会话，或者会话已过期，请重新登录。', type: 'warning' });
+      return Promise.reject();
     } else if (code === 500) {
       ElMessage({ message: msg, type: 'error' });
       return Promise.reject(new Error(msg));
     } else if (code !== 200) {
       ElNotification.error({ title: msg });
-      return Promise.reject('error');
+      return Promise.reject('code !== 200: ' + msg);
     } else {
       return res.data;
     }

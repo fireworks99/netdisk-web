@@ -1,4 +1,4 @@
-export default {
+export default new Proxy({
   "/file": {
     "code": 200,
     "msg": "success",
@@ -41,4 +41,15 @@ export default {
       }
     ]
   }
-}
+} as { [key: string]: any }, {
+  get(target, prop) {
+    if (/^\/file\/\d+\/download$/.test(prop as string)) {
+      return {
+        "code": 404,
+        "msg": "文件不存在",
+        "data": null
+      }
+    }
+    return target[prop as string];
+  }
+})

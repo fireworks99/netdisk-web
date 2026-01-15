@@ -2,10 +2,35 @@ import type { AxiosRequestConfig, AxiosAdapter } from 'axios';
 
 const modulesFiles = import.meta.glob('./modules/*.ts', { eager: true });
 
-const mockObj: { [key: string]: any } = {};
+const allModules: { [key: string]: any }[] = [];
+
 Object.keys(modulesFiles).forEach(modulePath => {
   const module = modulesFiles[modulePath] as { default: any };
-  Object.assign(mockObj, module.default);
+  allModules.push(module.default);
+});
+
+// 最终集中对象
+const mockObj: { [key: string]: any } = new Proxy({}, {
+  get(target, prop, receiver) {
+    // 先看 target 自己的属性
+    if (prop in target) {
+      return Reflect.get(target, prop, receiver);
+    }
+
+    // 遍历所有模块的 Proxy
+    for (const moduleProxy of allModules) {
+      if (prop in moduleProxy || typeof moduleProxy === 'object') {
+        // 注意：直接访问 moduleProxy[prop] 会触发各自 Proxy 的 get 拦截
+        const val = moduleProxy[prop as string];
+        if (val !== undefined) {
+          return val;
+        }
+      }
+    }
+
+    // 找不到就返回 undefined
+    return undefined;
+  }
 });
 
 const mockAdapter: AxiosAdapter = (config: AxiosRequestConfig) => {
