@@ -40,6 +40,11 @@ export default new Proxy({
         "createTime": "2026-01-06T15:14:31"
       }
     ]
+  },
+  "/file/upload": {
+    "code": 200,
+    "msg": "文件上传成功",
+    "data": null
   }
 } as { [key: string]: any }, {
   get(target, prop) {

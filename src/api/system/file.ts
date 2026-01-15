@@ -14,3 +14,15 @@ export function downloadFileById(fileId: string) {
     responseType: 'blob'
   })
 }
+
+// 上传文件
+export function uploadFile(data: FormData) {
+  return request({
+    url: '/file/upload',
+    method: 'post',
+    data,
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  })
+}

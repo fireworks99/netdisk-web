@@ -8,6 +8,10 @@ body {
   // 移动端
   #app.mobile {
 
+    .el-dialog {
+      max-width: 100%;
+    }
+
     .el-drawer__body {
       padding: 0;
     }

@@ -82,7 +82,7 @@ service.interceptors.response.use(
       ElNotification.error({ title: msg });
       return Promise.reject('code !== 200: ' + msg);
     } else {
-      return res.data;
+      return res;
     }
   },
   error => {
