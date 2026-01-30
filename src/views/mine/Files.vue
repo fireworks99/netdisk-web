@@ -14,7 +14,7 @@
         :formatter="(_: any, __: any, cell: any) => dayjs(cell).format('YYYY-MM-DD hh:mm:ss')" />
       <el-table-column label="操作" align="center">
         <template #default="{ row }">
-          <el-button size="small" @click="handleDownload(row.id)">下载</el-button>
+          <el-button size="small" @click="handleDownload(row)">下载</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -50,12 +50,13 @@
 // 工具
 import { ref, onMounted } from 'vue';
 import dayjs from 'dayjs';
-import { formatBytes, downloadFile } from '@/utils';
+import { formatBytes, downloadMinIOFile } from '@/utils';
 import { ElMessage, genFileId } from 'element-plus';
 import type { UploadInstance, UploadProps, UploadRawFile } from 'element-plus';
 
 // 数据
-import { getFiles, downloadFileById, uploadFile } from '@/api/system/file';
+import axios from 'axios';
+import { getFiles, downloadFileById, getUploadInfo, saveData } from '@/api/system/file';
 
 // ----------------- 加载文件列表 start -----------------
 const files = ref([]);
@@ -71,18 +72,11 @@ onMounted(() => {
 
 
 // ----------------- 下载文件 start -----------------
-const getFilenameFromHeader = (disposition?: string) => {
-  if (!disposition) return 'download'
-  const match = disposition.match(/filename\*=UTF-8''(.+)|filename="(.+)"/)
-  return decodeURIComponent(match?.[1] || match?.[2] || 'download')
-}
-
-const handleDownload = async (fileId: string) => {
+const handleDownload = async (row: { id: number, originalName: string }) => {
   try {
-    const res = await downloadFileById(fileId);
-    const disposition = res.headers['content-disposition'];
-    const filename = getFilenameFromHeader(disposition);
-    downloadFile(res.data, filename);
+    const res = await downloadFileById(row.id);
+    
+    downloadMinIOFile(res.data.data, row.originalName);
   } catch (e) {
     console.log(e);
   }
@@ -116,13 +110,40 @@ const handleUpload = async () => {
   }
 
   try {
-    const formData = new FormData();
-    formData.append('file', selectedFile);
+    const result = await getUploadInfo({
+      "originalName": selectedFile.name,
+      "contentType": selectedFile.type,
+      "size": selectedFile.size
+    });
 
-    const res = await uploadFile(formData);
+    const { objectName, uploadUrl } = result.data.data;
+
+    const putRes = await axios.put(uploadUrl, selectedFile, {
+      headers: {
+        'Content-Type': selectedFile.type
+      },
+      onUploadProgress: (e) => {
+        const percent = Math.round((e.loaded / e.total!) * 100)
+        console.log('上传进度:', percent)
+      }
+    });
+
+    
+    const etag = putRes.headers['etag']?.replace(/"/g, '');
+
+    await saveData({
+      "originalName": selectedFile.name,
+      "bucketName": window.APP_CONFIG.BUCKET,
+      "objectKey": objectName,
+      "fileSize": selectedFile.size,
+      "contentType": selectedFile.type,
+      "fileExt": selectedFile.name.split('.').pop(),
+      "uploaderId": 1,
+      etag,
+      "isPublic": false,
+    });
 
     // 失败会抛出异常，不会执行到这里
-    ElMessage.success(res.data.msg || '文件上传成功');
     dialogVisible.value = false;
     upload.value?.clearFiles();
     selectedFile = null;

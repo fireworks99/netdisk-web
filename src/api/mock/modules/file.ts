@@ -48,7 +48,7 @@ export default new Proxy({
   }
 } as { [key: string]: any }, {
   get(target, prop) {
-    if (/^\/file\/\d+\/download$/.test(prop as string)) {
+    if (/^\/file\/\d+\/url$/.test(prop as string)) {
       return {
         "code": 404,
         "msg": "文件不存在",

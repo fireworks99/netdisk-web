@@ -21,13 +21,17 @@ export function formatBytes(bytes: any) {
  * @param fileName 
  * @param fileType 
  */
-export function downloadFile(data: Blob, fileName: string) {
+export async function downloadMinIOFile(url: string, fileName: string = "") {
 
   try {
-    const blob = new Blob([data]);
-    const url = window.URL.createObjectURL(blob);
+    const response = await fetch(url);
+    if (!response.ok) throw new Error('下载失败');
+
+    const blob = await response.blob();
+    const blobUrl = window.URL.createObjectURL(blob);
+
     const link = document.createElement('a');
-    link.href = url;
+    link.href = blobUrl;
     link.download = fileName;
 
     // 触发下载

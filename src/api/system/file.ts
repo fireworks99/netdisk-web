@@ -7,22 +7,27 @@ export function getFiles() {
   })
 }
 
-// 下载文件
-export function downloadFileById(fileId: string) {
+// 下载文件第一步：拿到下载链接
+export function downloadFileById(fileId: number) {
   return request({
-    url: `/file/${fileId}/download`,
-    responseType: 'blob'
+    url: `/file/${fileId}/url`,
   })
 }
 
-// 上传文件
-export function uploadFile(data: FormData) {
+// 上传文件第一步：拿到url与objectName
+export function getUploadInfo(data: {}) {
   return request({
-    url: '/file/upload',
+    url: '/file/upload-url',
     method: 'post',
-    data,
-    headers: {
-      'Content-Type': 'multipart/form-data'
-    }
+    data
+  })
+}
+
+// 上传文件第二步：保存数据
+export function saveData(data: {}) {
+  return request({
+    url: '/file/save',
+    method: 'post',
+    data
   })
 }
