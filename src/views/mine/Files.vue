@@ -1,24 +1,28 @@
 <template>
   <div class="files_wrapper">
 
+    <!-- 1. 上传文件与新建文件夹 -->
     <div class="flex_bet" style="margin-bottom: 16px;">
       <el-button type="primary" icon="Plus" @click="dialogVisible = true">上传文件</el-button>
       <el-button icon="Plus">新建文件夹</el-button>
     </div>
 
+    <!-- 2. 文件陈列展示 -->
     <el-table :data="files">
       <el-table-column prop="originalName" label="文件名" show-overflow-tooltip />
       <el-table-column prop="fileSize" label="大小" align="center"
         :formatter="(_: any, __: any, cell: string) => formatBytes(cell)" />
-      <el-table-column prop="createTime" label="上传时间" align="center"
+      <el-table-column prop="createTime" label="上传时间" align="center" v-if="!layoutStore.isMobile"
         :formatter="(_: any, __: any, cell: any) => dayjs(cell).format('YYYY-MM-DD hh:mm:ss')" />
       <el-table-column label="操作" align="center">
         <template #default="{ row }">
           <el-button size="small" @click="handleDownload(row)">下载</el-button>
+          <el-button size="small" @click="handlePreview(row)">预览</el-button>
         </template>
       </el-table-column>
     </el-table>
 
+    <!-- 3. 上传文件对话框 -->
     <el-dialog v-model="dialogVisible" title="文件上传" width="460">
 
       <!-- 上传区域 -->
@@ -42,23 +46,40 @@
           <el-button type="primary" @click="handleUpload">确认</el-button>
         </div>
       </template>
+
     </el-dialog>
+
+    <!-- 4. 文件预览抽屉 -->
+    <!-- <Preview :url="preUrl" :ext="preExt"/> -->
+    <el-drawer v-model="previewing" :title="preName" :size="layoutStore.isMobile ? '70%' : '33%'"
+      :direction="layoutStore.isMobile ? 'btt' : 'rtl'">
+      <Preview :url="preUrl" :ext="preExt" :name="preName" />
+    </el-drawer>
+
   </div>
 </template>
 
 <script setup lang="ts">
-// 工具
+// Vue核心
 import { ref, onMounted } from 'vue';
+
+// 第三方库
 import dayjs from 'dayjs';
-import { formatBytes, downloadMinIOFile } from '@/utils';
+import axios from 'axios';
 import { ElMessage, genFileId } from 'element-plus';
 import type { UploadInstance, UploadProps, UploadRawFile } from 'element-plus';
 
-// 数据
-import axios from 'axios';
+// 自定义工具
+import { formatBytes, downloadMinIOFile } from '@/utils';
+
+// 状态管理
+import { useLayoutStore } from '@/store/layout';
+
+// API
 import { getFiles, downloadFileById, getUploadInfo, saveData } from '@/api/system/file';
 
 // ----------------- 加载文件列表 start -----------------
+const layoutStore = useLayoutStore();
 const files = ref([]);
 const loadTableData = async () => {
   const res = await getFiles();
@@ -75,7 +96,7 @@ onMounted(() => {
 const handleDownload = async (row: { id: number, originalName: string }) => {
   try {
     const res = await downloadFileById(row.id);
-    
+
     downloadMinIOFile(res.data.data, row.originalName);
   } catch (e) {
     console.log(e);
@@ -83,6 +104,25 @@ const handleDownload = async (row: { id: number, originalName: string }) => {
 }
 // ----------------- 下载文件 end -------------------
 
+
+// ----------------- 预览文件 start -----------------
+import Preview from "@/components/Preview.vue";
+const previewing = ref(false);
+const preUrl = ref("");
+const preExt = ref("");
+const preName = ref("");
+const handlePreview = async (row: { id: number, originalName: string }) => {
+  previewing.value = true;
+  preName.value = row.originalName;
+  try {
+    const res = await downloadFileById(row.id);
+    preUrl.value = res.data.data;
+    preExt.value = row.originalName.split('.').pop()?.toLowerCase() || "";
+  } catch (e) {
+    console.log(e);
+  }
+}
+// ----------------- 预览文件 end -------------------
 
 
 // ----------------- 上传文件 start -----------------
@@ -128,7 +168,7 @@ const handleUpload = async () => {
       }
     });
 
-    
+
     const etag = putRes.headers['etag']?.replace(/"/g, '');
 
     await saveData({
@@ -137,7 +177,7 @@ const handleUpload = async () => {
       "objectKey": objectName,
       "fileSize": selectedFile.size,
       "contentType": selectedFile.type,
-      "fileExt": selectedFile.name.split('.').pop(),
+      "fileExt": selectedFile.name.split('.').pop()?.toLowerCase(),
       "uploaderId": 1,
       etag,
       "isPublic": false,

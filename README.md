@@ -50,6 +50,7 @@
     * 引入sass，定义变量，编写全局样式
     * 引入dayjs，处理日期时间
     * 全局支持variables.scss
+  
 * 2026-01-08
 
   * Sidebar由路由渲染
@@ -57,6 +58,7 @@
     * @/router/index.ts里定义路由并导出
     * Sidebar导入路由并渲染
     * 引入el-scrollbar（灵活的滚动条）
+  
 * 2026-01-12
 
   * Sidebar可隐藏/显示
@@ -78,15 +80,35 @@
     * 添加isMobile状态（方便组件v-if渲染），#app挂载mobile/pc类（单独写样式）
     * sidebarCollapsed改成sidebarOpened，方便抽屉的v-model直接绑定
     * 监听路由变化，如果是移动端，则在路由变化后关闭Sidebar
+  
 * 2026-01-14
   * 前端调用后端接口
     * 添加config.json(运行时配置)并在启动前加载
     * window.APP_CONFIG做类型声明
     * 封装axios实例，定义请求拦截器（mock数据）、响应拦截器（统一错误处理）
+  
 * 2026-01-15
   * 对接文件下载接口
+  
   * 对接文件上传接口
+  
   * docker拉取minio镜像，为下一步做准备
+  
+    ~~~bash
+    docker run -d \
+      --name minio \
+      -p 9000:9000 \
+      -p 9001:9001 \
+      -e MINIO_ROOT_USER=minioadmin \
+      -e MINIO_ROOT_PASSWORD=minioadmin \
+      -v D:/minio/data:/data \
+      minio/minio server /data --console-address ":9001"
+    ~~~
+  
 * 2026-01-30
   * 修改前端上传逻辑：先从后端拿到minio的预签名url，再直传minio
   * 对接minio模式下的查询、上传、下载接口
+  
+* 2026-02-01
+
+  * 编写文件预览——图片采用Fancybox

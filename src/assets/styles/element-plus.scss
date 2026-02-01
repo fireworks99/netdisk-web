@@ -8,12 +8,21 @@ body {
   // 移动端
   #app.mobile {
 
+    // 对话框
     .el-dialog {
       max-width: 100%;
     }
 
+    // 抽屉
     .el-drawer__body {
       padding: 0;
+    }
+
+    // 表格
+    .el-table {
+      .cell {
+        padding: 0;
+      }
     }
 
   }

@@ -7,7 +7,7 @@ export function getFiles() {
   })
 }
 
-// 下载文件第一步：拿到下载链接
+// 下载文件第一步：拿到预签名url
 export function downloadFileById(fileId: number) {
   return request({
     url: `/file/${fileId}/url`,
