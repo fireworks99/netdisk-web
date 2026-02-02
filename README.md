@@ -120,3 +120,5 @@
   * 利用highlight.js实现code类文件预览
   * 引入video.js实现视频预览
   * 利用原生audio标签实现音频预览
+  * **性能优化**：Files.vue组件动态引入：2.3MB => 30KB , 9s => 500ms
+  * 改用**hash路由**，防止gh-pages 对 SPA **404**
