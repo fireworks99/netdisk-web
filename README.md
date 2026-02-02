@@ -115,3 +115,8 @@
   * 引入@vue-office，实现 pptx / docx / xlsx / pdf 预览
   
 * 2026-02-02
+
+  * 引入@kangc/v-md-editor，实现Markdown文件预览
+  * 利用highlight.js实现code类文件预览
+  * 引入video.js实现视频预览
+  * 利用原生audio标签实现音频预览

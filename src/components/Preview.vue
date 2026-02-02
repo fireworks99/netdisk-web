@@ -4,6 +4,8 @@
     <Office :url="props.url" :ext="props.ext" v-else-if="type === 'office'" />
     <Markdown :url="props.url" v-else-if="type === 'md'" />
     <Code :url="props.url" :ext="props.ext" v-else-if="type === 'code'" />
+    <Video :url="props.url" :ext="props.ext" v-else-if="type === 'video'" />
+    <Audio :url="props.url" :ext="props.ext" v-else-if="type === 'audio'" />
   </div>
 </template>
 
@@ -13,6 +15,8 @@ import Image from './filetype/Image.vue';
 import Office from './filetype/Office.vue';
 import Markdown from './filetype/Markdown.vue';
 import Code from './filetype/Code.vue';
+import Video from './filetype/Video.vue';
+import Audio from './filetype/Audio.vue';
 
 const props = defineProps<{
   url: string,
@@ -20,18 +24,19 @@ const props = defineProps<{
   name: string
 }>();
 
-const codeArr = [
-    "1C", "ABAP", "Ada", "Apache", "AppleScript", "Arduino", "ARMAssembly", "AVRAssembly",
-    "ActionScript", "AutoHotkey", "AutoIt", "Awk", "Bash", "Basic", "C", "C#", "C++",
-    "CMake", "Clojure", "CoffeeScript", "Crystal", "CSS", "D", "Dart", "Delphi", "Diff",
-    "Django", "DNSZone", "Dockerfile", "DOS", "Elixir", "Elm", "Erlang", "Fortran", "F#",
-    "Go", "GraphQL", "Groovy", "HTML", "HTTP", "Haskell", "Ini", "Java", "JavaScript",
-    "JSON", "Julia", "Kotlin", "LaTeX", "Less", "Lisp", "Lua", "Makefile", "Markdown",
-    "Matlab", "Nginx", "Objective-C", "OCaml", "Perl", "PHP", "Plaintext", "PowerShell",
-    "Prolog", "Properties", "Python", "R", "Ruby", "Rust", "Scala", "Scheme", "SCSS",
-    "ShellSession", "Smalltalk", "SQL", "Swift", "Tcl", "TOML", "TypeScript", "VBScript",
-    "VisualBasic.NET", "XML", "YAML", "TS"
-];
+const codeArr = ["bsl","os","abap","adb","ads","conf","htaccess","applescript",
+  "scpt","ino","s","asm","asm","inc","as","ahk","au3","awk","sh","bash","bas",
+  "c","h","cs","cpp","cc","cxx","hpp","hh","hxx","MakeLists.txt","cmake","clj",
+  "cljs","cljc","coffee","cr","css","d","dart","pas","dfm","fmx","diff","patch",
+  "html","py","zone","dns","ockerfile","dockerfile","bat","cmd","ex","exs","elm",
+  "erl","hrl","f","for","f90","f95","fs","fsi","fsx","go","graphql","gql","groovy",
+  "gvy","html","htm","http","rest","hs","lhs","ini","cfg","conf","java","js","jsx",
+  "mjs","json","jl","kt","kts","tex","sty","cls","less","lisp","lsp","cl","el",
+  "lua","akefile","mk","mak","md","markdown","m","mat","conf","m","mm","h","ml",
+  "mli","pl","pm","php","phtml","txt","text","ps1","psm1","psd1","pl","pro",
+  "properties","py","pyw","pyx","r","R","rb","ruby","rs","scala","sc","scm","ss",
+  "scss","sh-session","st","sql","swift","tcl","toml","ts","tsx","vbs","vb","xml",
+  "xsl","xslt","xsd","yaml","yml","ts","tsx"];
 
 const type = computed(() => {
   if(['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg'].includes(props.ext)) {
@@ -40,8 +45,12 @@ const type = computed(() => {
     return 'office';
   } else if(props.ext === 'md') {
     return 'md';
-  } else if(codeArr.includes(props.ext.toUpperCase())) {
+  } else if(codeArr.includes(props.ext)) {
     return 'code';
+  } else if(['mp4', 'webm', 'ogv', 'mov'].includes(props.ext)) {
+    return 'video';
+  } else if(['mp3', 'wav', 'ogg', 'aac', 'm4a', 'flac'].includes(props.ext)) {
+    return 'audio';
   }
   else {
     return '';
