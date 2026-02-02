@@ -59,7 +59,7 @@
 
 <script setup lang="ts">
 // Vue核心
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, defineAsyncComponent } from 'vue';
 
 // 第三方库
 import dayjs from 'dayjs';
@@ -104,7 +104,9 @@ const handleDownload = async (row: { id: number, originalName: string }) => {
 
 
 // ----------------- 预览文件 start -----------------
-import Preview from "@/components/Preview.vue";
+const Preview = defineAsyncComponent(() =>
+  import('@/components/Preview.vue')
+);
 const previewing = ref(false);
 const preUrl = ref("");
 const preExt = ref("");

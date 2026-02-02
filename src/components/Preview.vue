@@ -10,13 +10,25 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import Image from './filetype/Image.vue';
-import Office from './filetype/Office.vue';
-import Markdown from './filetype/Markdown.vue';
-import Code from './filetype/Code.vue';
-import Video from './filetype/Video.vue';
-import Audio from './filetype/Audio.vue';
+import { defineAsyncComponent, computed } from 'vue';
+const Image = defineAsyncComponent(() =>
+  import('@/components/filetype/Image.vue')
+);
+const Video = defineAsyncComponent(() =>
+  import('@/components/filetype/Video.vue')
+);
+const Office = defineAsyncComponent(() =>
+  import('@/components/filetype/Office.vue')
+);
+const Markdown = defineAsyncComponent(() =>
+  import('@/components/filetype/Markdown.vue')
+);
+const Code = defineAsyncComponent(() =>
+  import('@/components/filetype/Code.vue')
+);
+const Audio = defineAsyncComponent(() =>
+  import('@/components/filetype/Audio.vue')
+);
 
 const props = defineProps<{
   url: string,
