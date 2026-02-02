@@ -1,8 +1,10 @@
 <template>
-  <a :data-caption="props.name" :data-download-filename="props.name" v-if="props.url" style="cursor: pointer;"
-    @click="openPreview">
-    <img :src="props.url" :alt="props.name" style="max-width: 100%; object-fit: contain;" />
-  </a>
+  <div style="text-align: center">
+    <a :data-caption="props.name" :data-download-filename="props.name" v-if="props.url" style="cursor: pointer;"
+      @click="openPreview">
+      <img :src="props.url" :alt="props.name" style="max-width: 100%; object-fit: contain;" />
+    </a>
+  </div>
 </template>
 
 <script setup lang="ts">
