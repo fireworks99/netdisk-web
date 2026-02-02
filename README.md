@@ -112,3 +112,6 @@
 * 2026-02-01
 
   * 编写文件预览——图片采用Fancybox
+  * 引入@vue-office，实现 pptx / docx / xlsx / pdf 预览
+  
+* 2026-02-02

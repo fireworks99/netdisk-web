@@ -50,9 +50,7 @@
     </el-dialog>
 
     <!-- 4. 文件预览抽屉 -->
-    <!-- <Preview :url="preUrl" :ext="preExt"/> -->
-    <el-drawer v-model="previewing" :title="preName" :size="layoutStore.isMobile ? '70%' : '33%'"
-      :direction="layoutStore.isMobile ? 'btt' : 'rtl'">
+    <el-drawer v-model="previewing" :title="preName" size="70%" direction="btt">
       <Preview :url="preUrl" :ext="preExt" :name="preName" />
     </el-drawer>
 
@@ -112,7 +110,6 @@ const preUrl = ref("");
 const preExt = ref("");
 const preName = ref("");
 const handlePreview = async (row: { id: number, originalName: string }) => {
-  previewing.value = true;
   preName.value = row.originalName;
   try {
     const res = await downloadFileById(row.id);
@@ -120,6 +117,8 @@ const handlePreview = async (row: { id: number, originalName: string }) => {
     preExt.value = row.originalName.split('.').pop()?.toLowerCase() || "";
   } catch (e) {
     console.log(e);
+  } finally {
+    previewing.value = true;
   }
 }
 // ----------------- 预览文件 end -------------------
