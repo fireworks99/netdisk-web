@@ -124,12 +124,8 @@ const getFileIconName = (row: { type: string, name: string }): string => {
     'jpg': 'image',
     'jpeg': 'image',
     'png': 'image',
-    'svg': 'image',
     'mp3': 'audio',
     'mp4': 'video',
-    'webm': 'video',
-    'mov': 'video',
-    'ogv': 'video',
     'md': 'md',
   };
 
@@ -226,9 +222,7 @@ const handleUpload = async () => {
 
     const { objectName, uploadUrl } = result.data.data;
 
-    let putRes = { headers: { etag: '' } };
-
-    !window.APP_CONFIG.USE_MOCK && (putRes = await axios.put(uploadUrl, selectedFile, {
+    const putRes = await axios.put(uploadUrl, selectedFile, {
       headers: {
         'Content-Type': selectedFile.type
       },
@@ -236,7 +230,7 @@ const handleUpload = async () => {
         const percent = Math.round((e.loaded / e.total!) * 100)
         console.log('上传进度:', percent)
       }
-    }));
+    });
 
     const etag = putRes.headers['etag']?.replace(/"/g, '');
 
@@ -254,7 +248,6 @@ const handleUpload = async () => {
     });
 
     // 失败会抛出异常，不会执行到这里
-    ElMessage.success("文件上传成功");
     dialogVisible.value = false;
     upload.value?.clearFiles();
     selectedFile = null;
@@ -283,7 +276,6 @@ const handleAddFolder = () => {
     .then(async ({ value }) => {
       await addFolder({ name: value.trim(), parentId });
       await loadTableData();
-      ElMessage.success("文件夹创建成功");
     })
     .catch(() => {
       ElMessage({

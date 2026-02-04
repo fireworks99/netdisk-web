@@ -5,7 +5,7 @@ import { createPinia } from 'pinia'
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 import '@/assets/styles/index.scss'
-import * as ElementPlusIconsVue from '@element-plus/icons-vue'
+import * as ElementPlusIcons from '@element-plus/icons-vue'
 
 async function bootstrap() {
   const baseUrl = import.meta.env.BASE_URL
@@ -16,7 +16,7 @@ async function bootstrap() {
 
   const app = createApp(App)
 
-  for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
+  for (const [key, component] of Object.entries(ElementPlusIcons)) {
     app.component(key, component)
   }
 

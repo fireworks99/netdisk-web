@@ -5,7 +5,7 @@
  */
 export function formatBytes(bytes: any) {
   if (bytes === 0) return '0 B';
-  if (isNaN(bytes) || bytes < 0) return '';
+  if (bytes === null || isNaN(bytes) || bytes < 0) return '';
 
   const units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
   const k = 1024;

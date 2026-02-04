@@ -38,7 +38,7 @@ const props = defineProps<{
 
 const codeArr = ["bsl","os","abap","adb","ads","conf","htaccess","applescript",
   "scpt","ino","s","asm","asm","inc","as","ahk","au3","awk","sh","bash","bas",
-  "c","h","cs","cpp","cc","cxx","hpp","hh","hxx","MakeLists.txt","cmake","clj",
+  "c","h","cs","cpp","cc","cxx","hpp","hh","hxx", "cmake","clj", "vue",
   "cljs","cljc","coffee","cr","css","d","dart","pas","dfm","fmx","diff","patch",
   "html","py","zone","dns","ockerfile","dockerfile","bat","cmd","ex","exs","elm",
   "erl","hrl","f","for","f90","f95","fs","fsi","fsx","go","graphql","gql","groovy",
