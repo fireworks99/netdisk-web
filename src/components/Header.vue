@@ -12,7 +12,7 @@
       </div>
 
       <div class="bread_wrapper">
-        <Breadcrumb />
+        <Breadcrumb :breadcrumb-list="breadcrumbList"/>
       </div>
 
     </div>
@@ -23,16 +23,40 @@
 </template>
 
 <script setup lang="ts">
-// 组件
-import { ref, onMounted, onBeforeUnmount } from 'vue';
-import { useLayoutStore } from '@/store/layout';
-import Breadcrumb from './Breadcrumb.vue';
+import { ref, onMounted, onBeforeUnmount, watch, computed } from 'vue';
 
-// 工具
-import dayjs from 'dayjs';
+
+
+// -------------------------- 全局面包屑 start  ------------------------
+import Breadcrumb from './Breadcrumb.vue';
+import { useRoute } from 'vue-router';
+const route = useRoute();
+const breadcrumbList = computed(() => {
+  return route.matched.filter(item => item.meta && item.meta.title).map(item => ({
+      title: item.meta.title as string,  // 确保 title 存在
+      path: item.path as string,
+      icon: item.meta.icon as Object  // 如果有 icon 字段
+    }));
+});
+
+import { useLayoutStore } from '@/store/layout';
+const layoutStore = useLayoutStore();
+
+// 路有变化时，若为移动端，关闭Sidebar
+watch(
+  () => route.fullPath,
+  () => {
+    if (layoutStore.isMobile) {
+      layoutStore.closeSidebar();
+    }
+  }
+)
+// -------------------------- 全局面包屑 end  ------------------------
+
 
 
 // -------------------------- 时钟 start  ------------------------
+import dayjs from 'dayjs';
 const clcokText = ref("");
 const _timer = ref<number | null>(null);
 
@@ -57,10 +81,6 @@ onBeforeUnmount(() => {
   }
 })
 // -------------------------- 时钟 end  --------------------------
-
-// -------------------------- Sidebar切换 start  ------------------------
-const layoutStore = useLayoutStore();
-// -------------------------- Sidebar切换 end  --------------------------
 
 </script>
 
