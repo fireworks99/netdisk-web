@@ -2,18 +2,19 @@
   <div class="files_wrapper">
 
     <!-- 1. 上传文件与新建文件夹 -->
-    <div class="flex_bet" style="margin-bottom: 16px;">
+    <div class="header">
       <div>
-        <Breadcrumb :breadcrumb-list="breadcrumbList"/>
+        <Breadcrumb :breadcrumb-list="breadcrumbList" sepa="/" :clickable="true" @menu-click="cdUp" />
       </div>
-      <div>
+      <div style="display: flex;">
+        <el-button icon="Back" @click="cdUp" v-show="path.length > 1">返回上级</el-button>
         <el-button type="primary" icon="Plus" @click="dialogVisible = true">上传文件</el-button>
         <el-button icon="Plus" @click="handleAddFolder">新建文件夹</el-button>
       </div>
     </div>
 
     <!-- 2. 文件陈列展示 -->
-    <el-table :data="files" @row-dblclick="handleRowDoubleClick">
+    <el-table :data="files" @[eventName]="handleRowClick">
       <el-table-column prop="name" label="文件名" show-overflow-tooltip>
         <template #default="scope">
           <div style="display: flex; align-items: center; gap: 8px;">
@@ -25,7 +26,7 @@
       <el-table-column prop="fileSize" label="大小" align="center"
         :formatter="(_: any, __: any, cell: string) => formatBytes(cell)" />
       <el-table-column prop="createTime" label="上传时间" align="center" v-if="!layoutStore.isMobile"
-        :formatter="(_: any, __: any, cell: any) => dayjs(cell).format('YYYY-MM-DD hh:mm:ss')" />
+        :formatter="(_: any, __: any, cell: any) => dayjs(cell).format('YYYY-MM-DD HH:mm:ss')" />
       <el-table-column label="操作" align="center">
         <template #default="{ row }">
           <el-button size="small" @click="handleDownload(row)" v-if="row.type === 'FILE'">下载</el-button>
@@ -92,9 +93,27 @@ import { getList, getUploadInfo, saveFileInfo, getPDUrl, addFolder } from '@/api
 import type { DiskItem } from '@/types';
 
 
-const path = reactive<DiskItem[]>([]);
+const path = reactive<DiskItem[]>([
+  {
+    "id": -1,
+    "type": "FOLDER",
+    "name": "",
+    "parentId": null,
+    "ownerId": -1,
+    "bucketName": null,
+    "objectKey": null,
+    "fileSize": null,
+    "contentType": null,
+    "fileExt": null,
+    "etag": null,
+    "isDeleted": false,
+    "deletedAt": null,
+    "createTime": "",
+    "updateTime": ""
+  }
+]);
 const parentId = computed(() => {
-  return path.length > 0 ? path[path.length - 1]?.id : undefined;
+  return path.length > 1 ? path[path.length - 1]?.id : undefined;
 })
 
 
@@ -171,13 +190,42 @@ onMounted(() => {
 
 
 
-// ----------------- 双击行 start -----------------
-const handleRowDoubleClick = (row: DiskItem, _: any, __: any) => {
-  path.push(row);
+// ----------------- 行点击 start -----------------
+const handleRowClick = (row: DiskItem, _: any, __: any) => {
+  if(row.type === 'FOLDER') {
+    path.push(row);
+    loadTableData();
+  }
+};
+
+const eventName = computed(() => {
+  return layoutStore.isMobile ? 'row-click' : 'row-dblclick';
+})
+// ----------------- 行点击 end -------------------
+
+
+
+//  ----------------- 返回上级 start  -----------------
+import type { Breadcrumb as BC } from '@/types';
+const cdUp = (p?: BC) => {
+  if (p?.path) {
+    if(p.path === '__ellipsis__') return;
+    while(path.length > 1) {
+      const last = path[path.length - 1];
+      if(last?.name + '_' + last?.id !== p.path) {
+        path.pop();
+      } else {
+        break;
+      }
+    }
+  } else {
+    if (path.length > 1) {
+      path.pop();
+    }
+  }
   loadTableData();
 }
-// ----------------- 双击行 end -------------------
-
+//  ----------------- 返回上级 end  -------------------
 
 
 // -------------------------- 文件面包屑 start  ------------------------
@@ -185,7 +233,7 @@ import { Folder } from '@element-plus/icons-vue';
 import Breadcrumb from '@/components/Breadcrumb.vue';
 const breadcrumbList = computed(() => {
   return path.map(item => ({
-    path: item.name,
+    path: item.name + '_' + item.id,
     icon: Folder,
     title: item.name
   }))
@@ -329,3 +377,24 @@ const handleAddFolder = () => {
 }
 // ----------------- 创建文件夹 end -----------------
 </script>
+
+<style lang="scss" scoped>
+.files_wrapper {
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+
+    margin-bottom: 16px;
+  }
+}
+
+#app.mobile {
+  .files_wrapper {
+    .header {
+      flex-direction: column;
+    }
+  }
+}
+</style>

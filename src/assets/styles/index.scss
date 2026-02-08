@@ -28,6 +28,10 @@ body {
     justify-content: space-between;
   }
 
+  .cp {
+    cursor: pointer;
+  }
+
   /* 页面切换动画 */
   .fade-slide-enter-active,
   .fade-slide-leave-active {
