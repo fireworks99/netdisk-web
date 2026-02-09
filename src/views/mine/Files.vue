@@ -29,8 +29,9 @@
         :formatter="(_: any, __: any, cell: any) => dayjs(cell).format('YYYY-MM-DD HH:mm:ss')" />
       <el-table-column label="操作" align="center">
         <template #default="{ row }">
-          <el-button size="small" @click="handleDownload(row)" v-if="row.type === 'FILE'">下载</el-button>
-          <el-button size="small" @click="handlePreview(row)" v-if="row.type === 'FILE'">预览</el-button>
+          <el-button size="small" @click.stop="handleDownload(row)" v-if="row.type === 'FILE'">下载</el-button>
+          <el-button size="small" @click.stop="handlePreview(row)" v-if="row.type === 'FILE'">预览</el-button>
+          <el-button size="small" @click.stop="handleMove(row)">移动</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -67,12 +68,15 @@
       <Preview :url="preUrl" :ext="preExt" :name="preName" />
     </el-drawer>
 
+    <!-- 5. 文件移动对话框 -->
+    <MoveDest :cur-path="path" v-model:move-visiable="moveVisiable" :move-which="moveWhich"/>
+
   </div>
 </template>
 
 <script setup lang="ts">
 // Vue核心
-import { ref, reactive, onMounted, defineAsyncComponent, computed } from 'vue';
+import { ref, onMounted, defineAsyncComponent, watch } from 'vue';
 
 // 第三方库
 import dayjs from 'dayjs';
@@ -83,162 +87,42 @@ import type { UploadInstance, UploadProps, UploadRawFile } from 'element-plus';
 // 自定义工具
 import { formatBytes, downloadMinIOFile } from '@/utils';
 
-// 状态管理
-import { useLayoutStore } from '@/store/layout';
+// 自定义组件
+import Breadcrumb from '@/components/Breadcrumb.vue';
 
 // API
-import { getList, getUploadInfo, saveFileInfo, getPDUrl, addFolder } from '@/api/system/disk';
+import { getUploadInfo, saveFileInfo, getPDUrl, addFolder } from '@/api/system/disk';
 
 // 类型声明
 import type { DiskItem } from '@/types';
 
+// 组合式函数
+import { useFileSystem } from '@/composables/useFileSystem';
 
-const path = reactive<DiskItem[]>([
-  {
-    "id": -1,
-    "type": "FOLDER",
-    "name": "",
-    "parentId": null,
-    "ownerId": -1,
-    "bucketName": null,
-    "objectKey": null,
-    "fileSize": null,
-    "contentType": null,
-    "fileExt": null,
-    "etag": null,
-    "isDeleted": false,
-    "deletedAt": null,
-    "createTime": "",
-    "updateTime": ""
-  }
-]);
-const parentId = computed(() => {
-  return path.length > 1 ? path[path.length - 1]?.id : undefined;
-})
+const {
+  path,
+  parentId,
 
+  breadcrumbList,//面包屑
 
-// ----------------- 加载文件列表 start -----------------
-const iconMap = ref<Record<string, string>>({});
+  cdUp,//返回上级
 
-const icons = [
-  'folder', 'file', 'pdf', 'docx', 'xlsx', 'pptx',
-  'image', 'audio', 'video', 'md'
-];
+  // 文件列表
+  loadIcons,
+  getIconUrl,
+  files,
+  loadTableData,
 
-const loadIcons = async () => {
-  for (const icon of icons) {
-    const module = await import(`@/assets/images/icons/${icon}.svg?url`)
-    iconMap.value[icon] = module.default
-  }
-};
+  // 行点击
+  layoutStore,
+  eventName,
+  handleRowClick
+} = useFileSystem();
 
 onMounted(() => {
   loadIcons();
-});
-
-const getIconUrl = (row: DiskItem) => {
-  const iconName = getFileIconName(row);
-  return iconMap.value[iconName] || iconMap.value.file;
-}
-
-const getFileIconName = (row: DiskItem): string => {
-  if (row.type === 'FOLDER') {
-    return 'folder';
-  }
-
-  const extension = getFileExtension(row.name);
-  const iconMap: Record<string, string> = {
-    'pdf': 'pdf',
-    'doc': 'docx',
-    'docx': 'docx',
-    'xls': 'xlsx',
-    'xlsx': 'xlsx',
-    'ppt': 'pptx',
-    'pptx': 'pptx',
-    'jpg': 'image',
-    'jpeg': 'image',
-    'png': 'image',
-    'svg': 'image',
-    'mp3': 'audio',
-    'mp4': 'video',
-    'webm': 'video',
-    'mov': 'video',
-    'ogv': 'video',
-    'md': 'md',
-  };
-
-  return iconMap[extension.toLowerCase()] || 'file';
-}
-
-const getFileExtension = (filename: string): string => {
-  const parts = filename.split('.');
-  return parts.length > 1 ? parts.pop()! : '';
-};
-
-const layoutStore = useLayoutStore();
-const files = ref([]);
-
-const loadTableData = async () => {
-  const res = await getList(parentId.value ? { parentId: parentId.value } : undefined);
-  files.value = res.data.data;
-}
-
-onMounted(() => {
   loadTableData();
 });
-// ----------------- 加载文件列表 end -------------------
-
-
-
-// ----------------- 行点击 start -----------------
-const handleRowClick = (row: DiskItem, _: any, __: any) => {
-  if(row.type === 'FOLDER') {
-    path.push(row);
-    loadTableData();
-  }
-};
-
-const eventName = computed(() => {
-  return layoutStore.isMobile ? 'row-click' : 'row-dblclick';
-})
-// ----------------- 行点击 end -------------------
-
-
-
-//  ----------------- 返回上级 start  -----------------
-import type { Breadcrumb as BC } from '@/types';
-const cdUp = (p?: BC) => {
-  if (p?.path) {
-    if(p.path === '__ellipsis__') return;
-    while(path.length > 1) {
-      const last = path[path.length - 1];
-      if(last?.name + '_' + last?.id !== p.path) {
-        path.pop();
-      } else {
-        break;
-      }
-    }
-  } else {
-    if (path.length > 1) {
-      path.pop();
-    }
-  }
-  loadTableData();
-}
-//  ----------------- 返回上级 end  -------------------
-
-
-// -------------------------- 文件面包屑 start  ------------------------
-import { Folder } from '@element-plus/icons-vue';
-import Breadcrumb from '@/components/Breadcrumb.vue';
-const breadcrumbList = computed(() => {
-  return path.map(item => ({
-    path: item.name + '_' + item.id,
-    icon: Folder,
-    title: item.name
-  }))
-})
-// -------------------------- 文件面包屑 end  ------------------------
 
 
 
@@ -376,6 +260,24 @@ const handleAddFolder = () => {
     });
 }
 // ----------------- 创建文件夹 end -----------------
+
+
+
+// ----------------- 移动文件（夹）start -----------------
+import MoveDest from '@/components/MoveDest.vue';
+const moveVisiable = ref(false);
+const moveWhich = ref();
+const handleMove = async (row: DiskItem) => {
+  moveVisiable.value = true;
+  moveWhich.value = row;
+};
+watch(
+  () => moveVisiable.value,
+  val => {
+    !val && (loadTableData());
+  }
+)
+// ----------------- 移动文件（夹）end -------------------
 </script>
 
 <style lang="scss" scoped>

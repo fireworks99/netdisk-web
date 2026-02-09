@@ -42,6 +42,15 @@ export function getPDUrl(id: number) {
   })
 }
 
+// 移动文件（夹）
+export function move(data: {}) {
+  return request({
+    url: '/disk/move',
+    method: 'post',
+    data
+  })
+}
+
 // 删除文件（夹）
 export function deleteF(id: number) {
   return request({
