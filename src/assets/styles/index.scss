@@ -32,6 +32,23 @@ body {
     cursor: pointer;
   }
 
+  .table-operations {
+    display: flex;
+    gap: 6px;
+    gap: 6px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: nowrap;
+
+    .el-button {
+      margin: 0;
+      flex-shrink: 0;
+      padding: 5px 8px;
+      font-size: 12px;
+      border-radius: 4px;
+    }
+  }
+
   /* 页面切换动画 */
   .fade-slide-enter-active,
   .fade-slide-leave-active {

@@ -27,11 +27,14 @@
         :formatter="(_: any, __: any, cell: string) => formatBytes(cell)" />
       <el-table-column prop="createTime" label="上传时间" align="center" v-if="!layoutStore.isMobile"
         :formatter="(_: any, __: any, cell: any) => dayjs(cell).format('YYYY-MM-DD HH:mm:ss')" />
-      <el-table-column label="操作" align="center">
+      <el-table-column label="操作" align="center" width="188">
         <template #default="{ row }">
-          <el-button size="small" @click.stop="handleDownload(row)" v-if="row.type === 'FILE'">下载</el-button>
-          <el-button size="small" @click.stop="handlePreview(row)" v-if="row.type === 'FILE'">预览</el-button>
-          <el-button size="small" @click.stop="handleMove(row)">移动</el-button>
+          <div class="table-operations">
+            <el-button size="small" @click.stop="handleDownload(row)" v-if="row.type === 'FILE'">下载</el-button>
+            <el-button size="small" @click.stop="handlePreview(row)" v-if="row.type === 'FILE'">预览</el-button>
+            <el-button size="small" @click.stop="handleMove(row)">移动</el-button>
+            <el-button size="small" type="danger" @click.stop="handleDelete(row)">删除</el-button>
+          </div>
         </template>
       </el-table-column>
     </el-table>
@@ -69,7 +72,7 @@
     </el-drawer>
 
     <!-- 5. 文件移动对话框 -->
-    <MoveDest :cur-path="path" v-model:move-visiable="moveVisiable" :move-which="moveWhich"/>
+    <MoveDest :cur-path="path" v-model:move-visiable="moveVisiable" :move-which="moveWhich" />
 
   </div>
 </template>
@@ -91,7 +94,7 @@ import { formatBytes, downloadMinIOFile } from '@/utils';
 import Breadcrumb from '@/components/Breadcrumb.vue';
 
 // API
-import { getUploadInfo, saveFileInfo, getPDUrl, addFolder } from '@/api/system/disk';
+import { getUploadInfo, saveFileInfo, getPDUrl, addFolder, deleteF } from '@/api/system/disk';
 
 // 类型声明
 import type { DiskItem } from '@/types';
@@ -278,6 +281,36 @@ watch(
   }
 )
 // ----------------- 移动文件（夹）end -------------------
+
+
+
+// ----------------- 删除文件（夹）start -----------------
+const handleDelete = async (row: DiskItem) => {
+  ElMessageBox.confirm(
+    `确认删除 ${row.name} 吗？`,
+    '提示',
+    {
+      confirmButtonText: '确认',
+      cancelButtonText: '取消',
+      type: 'warning',
+    }
+  )
+    .then(async () => {
+      await deleteF(row.id);
+      loadTableData();
+      ElMessage({
+        type: 'success',
+        message: '删除成功',
+      });
+    })
+    .catch(() => {
+      ElMessage({
+        type: 'info',
+        message: '未删除',
+      });
+    })
+}
+// ----------------- 删除文件（夹）end -------------------
 </script>
 
 <style lang="scss" scoped>

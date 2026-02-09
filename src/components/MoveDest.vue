@@ -108,7 +108,8 @@ const handleMoveReally = async() => {
   }
 
   try {
-    await move({ id: props.moveWhich.id, parentId: path[path.length - 1]?.id });
+    const pid = path[path.length - 1]?.id;
+    await move({ id: props.moveWhich.id, parentId: pid === -1 ? null : pid });
     dialogVisible.value = false;
   } catch (e) {
     ElMessage.error('移动失败');
