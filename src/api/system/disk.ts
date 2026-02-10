@@ -58,3 +58,26 @@ export function deleteF(id: number) {
     method: 'delete',
   })
 }
+
+// 回收站列表
+export function recycleList() {
+  return request({
+    url: '/disk/recycle',
+  })
+}
+
+// 恢复已删除的文件
+export function restore(id: number) {
+  return request({
+    url: `/disk/${id}/restore`,
+    method: "post"
+  })
+}
+
+// 彻底删除
+export function deleteForever(id: number) {
+  return request({
+    url: `/disk/${id}/forever`,
+    method: "delete"
+  })
+}

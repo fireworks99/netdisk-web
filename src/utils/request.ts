@@ -80,6 +80,10 @@ service.interceptors.response.use(
       return Promise.reject(new Error(msg));
     } else if (code !== 200) {
       ElNotification.error({ title: msg });
+      /**
+       * 直接想法是抛出异常，但是async函数中无法使用throw，因为需要返回Promise
+       * 所以这里干脆直接使用Promise.reject来代替throw
+       */
       return Promise.reject('code !== 200: ' + msg);
     } else {
       return res;
