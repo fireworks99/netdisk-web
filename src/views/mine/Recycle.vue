@@ -88,6 +88,10 @@ onMounted(() => {
 const restoreF = async (row: DiskItem) => {
   try {
     await restore(row.id);
+    ElMessage({
+      type: 'success',
+      message: '恢复成功',
+    });
     loadTableData();
   } catch (e) {
     console.log(e);

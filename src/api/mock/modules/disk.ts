@@ -241,17 +241,63 @@ export default new Proxy({
       "createTime": null,
       "updateTime": null
     }
+  },
+  "/disk/recycle": {
+    "code": 200,
+    "msg": "success",
+    "data": [
+      {
+        "id": 18,
+        "type": "FILE",
+        "name": "Vue.png",
+        "parentId": null,
+        "ownerId": 1,
+        "bucketName": "netdisk",
+        "objectKey": "user-1/1770194793957_Vue_prototype.drawio.png",
+        "fileSize": 69585,
+        "contentType": "image/png",
+        "fileExt": "png",
+        "etag": "d4853649f145e71667868d13b5e13af9",
+        "isDeleted": true,
+        "deletedAt": "2026-02-10T13:27:56",
+        "createTime": "2026-02-04T16:46:34",
+        "updateTime": "2026-02-10T13:27:56"
+      },
+      {
+        "id": 17,
+        "type": "FOLDER",
+        "name": "第二层",
+        "parentId": 13,
+        "ownerId": 1,
+        "bucketName": null,
+        "objectKey": null,
+        "fileSize": null,
+        "contentType": null,
+        "fileExt": null,
+        "etag": null,
+        "isDeleted": true,
+        "deletedAt": "2026-02-09T11:12:37",
+        "createTime": "2026-02-04T16:46:14",
+        "updateTime": "2026-02-09T11:12:37"
+      }
+    ]
   }
 } as { [key: string]: any }, {
   get(target, prop) {
     if (/^\/disk\/\d+\/url$/.test(prop as string)) {
       const num = parseInt(prop.toString().slice(6));
-      const arr = ['', '', '', 'pdf.pdf', 'execl.xlsx', 'ppt.pptx', "word.docx", 
+      const arr = ['', '', '', 'pdf.pdf', 'execl.xlsx', 'ppt.pptx', "word.docx",
         "video.mp4", 'markdown.md', 'image.svg', 'code.vue', 'audio.mp3'];
       return {
         "code": 200,
         "msg": "success",
         "data": `${location.origin + location.pathname}samples/${arr[num]}`
+      }
+    } else if(/^\/disk\/\d+\/(restore|forever)$/.test(prop as string)) {
+      return {
+        "code": 200,
+        "msg": "success",
+        "data": null
       }
     }
     return target[prop as string];
