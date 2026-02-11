@@ -1,7 +1,7 @@
 import { ref, reactive, computed } from 'vue';
 import type { DiskItem } from '@/types';
 import { useLayoutStore } from '@/store/layout';
-import { getList } from '@/api/system/disk';
+import { getFByCondition } from '@/api/system/disk';
 import { Folder } from '@element-plus/icons-vue';
 
 export const useFileSystem = (initialPath?: DiskItem[]) => {
@@ -106,11 +106,34 @@ export const useFileSystem = (initialPath?: DiskItem[]) => {
     return parts.length > 1 ? parts.pop()! : '';
   };
 
+  const keyword = ref('');
+  const deleted = ref(false);
+  const pageNum = ref(1);
+  const pageSize = ref(10);
+
   const files = ref<DiskItem[]>([]);
+  const total = ref(0);
+
   const loadTableData = async () => {
-    const res = await getList(parentId.value ? { parentId: parentId.value } : undefined);
-    files.value = res.data.data;
+    const res = await getFByCondition({
+      parentId: parentId.value,
+      keyword: keyword.value,
+      deleted: deleted.value,
+      pageNum: pageNum.value,
+      pageSize: pageSize.value
+    });
+    files.value = res.data.data.records;
+    total.value = res.data.data.total;
   }
+
+  const handleCurrentChange = () => {
+    loadTableData();
+  };
+
+  const handleSizeChange = () => {
+    pageNum.value = 1;
+    loadTableData();
+  };
   // ----------------- 文件列表 end -----------------
 
 
@@ -145,8 +168,15 @@ export const useFileSystem = (initialPath?: DiskItem[]) => {
     getIconUrl,
     getFileIconName,
     getFileExtension,
+    keyword,
+    deleted,
+    pageNum,
+    pageSize,
     files,
+    total,
     loadTableData,
+    handleCurrentChange,
+    handleSizeChange,
 
     // 行点击
     layoutStore,

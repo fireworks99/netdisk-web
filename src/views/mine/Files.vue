@@ -39,6 +39,12 @@
       </el-table-column>
     </el-table>
 
+    <div class="flex_center" style="margin-top: 16px;">
+      <el-pagination v-model:current-page="pageNum" v-model:page-size="pageSize" :page-sizes="[10, 20, 30, 40]"
+        layout="total, sizes, prev, pager, next, jumper" :total="total" @size-change="handleSizeChange"
+        @current-change="handleCurrentChange" />
+    </div>
+
     <!-- 3. 上传文件对话框 -->
     <el-dialog v-model="dialogVisible" title="文件上传" width="460">
 
@@ -72,7 +78,7 @@
     </el-drawer>
 
     <!-- 5. 文件移动对话框 -->
-    <MoveDest :cur-path="path" v-model:move-visiable="moveVisiable" :move-which="moveWhich" />
+    <MoveDest :cur-path="path" v-model:move-visiable="moveVisiable" :move-which="moveWhich" v-if="moveVisiable" />
 
   </div>
 </template>
@@ -113,8 +119,14 @@ const {
   // 文件列表
   loadIcons,
   getIconUrl,
+  keyword,
+  pageNum,
+  pageSize,
   files,
+  total,
   loadTableData,
+  handleCurrentChange,
+  handleSizeChange,
 
   // 行点击
   layoutStore,
@@ -267,7 +279,9 @@ const handleAddFolder = () => {
 
 
 // ----------------- 移动文件（夹）start -----------------
-import MoveDest from '@/components/MoveDest.vue';
+const MoveDest = defineAsyncComponent(() =>
+  import('@/components/MoveDest.vue')
+);
 const moveVisiable = ref(false);
 const moveWhich = ref();
 const handleMove = async (row: DiskItem) => {
@@ -332,4 +346,5 @@ const handleDelete = async (row: DiskItem) => {
     }
   }
 }
+
 </style>

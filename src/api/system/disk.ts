@@ -81,3 +81,11 @@ export function deleteForever(id: number) {
     method: "delete"
   })
 }
+
+// 分页按条件查询
+export function getFByCondition(params: {}) {
+  return request({
+    url: '/disk/page',
+    params
+  })
+}
