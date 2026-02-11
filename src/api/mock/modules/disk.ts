@@ -281,6 +281,185 @@ export default new Proxy({
         "updateTime": "2026-02-09T11:12:37"
       }
     ]
+  },
+  "/disk/page": {
+    "code": 200,
+    "msg": "success",
+    "data": {
+      "total": 12,
+      "records": [
+        {
+          "id": 2,
+          "type": "FOLDER",
+          "name": "Java",
+          "parentId": null,
+          "ownerId": 1,
+          "bucketName": null,
+          "objectKey": null,
+          "fileSize": null,
+          "contentType": null,
+          "fileExt": null,
+          "etag": null,
+          "isDeleted": false,
+          "deletedAt": null,
+          "createTime": "2026-02-04T11:53:39",
+          "updateTime": "2026-02-10T10:54:02"
+        },
+        {
+          "id": 16,
+          "type": "FOLDER",
+          "name": "Vue",
+          "parentId": null,
+          "ownerId": 1,
+          "bucketName": null,
+          "objectKey": null,
+          "fileSize": null,
+          "contentType": null,
+          "fileExt": null,
+          "etag": null,
+          "isDeleted": false,
+          "deletedAt": null,
+          "createTime": "2026-02-04T14:14:09",
+          "updateTime": "2026-02-04T14:14:09"
+        },
+        {
+          "id": 14,
+          "type": "FILE",
+          "name": "Worlds_animate.gif",
+          "parentId": null,
+          "ownerId": 1,
+          "bucketName": "netdisk",
+          "objectKey": "user-1/1770185051260_Worlds_animate.gif",
+          "fileSize": 555242,
+          "contentType": "image/gif",
+          "fileExt": "gif",
+          "etag": "3b33150c6286ef28d70dbcee29edc578",
+          "isDeleted": false,
+          "deletedAt": null,
+          "createTime": "2026-02-04T14:04:11",
+          "updateTime": "2026-02-04T14:04:11"
+        },
+        {
+          "id": 12,
+          "type": "FILE",
+          "name": "pdf.pdf",
+          "parentId": null,
+          "ownerId": 1,
+          "bucketName": "netdisk",
+          "objectKey": "user-1/1770183772266_pdf.pdf",
+          "fileSize": 166737,
+          "contentType": "application/pdf",
+          "fileExt": "pdf",
+          "etag": "80f7506c29ff18eb48bd464efcbb89ca",
+          "isDeleted": false,
+          "deletedAt": null,
+          "createTime": "2026-02-04T13:42:52",
+          "updateTime": "2026-02-04T13:42:52"
+        },
+        {
+          "id": 11,
+          "type": "FILE",
+          "name": "execl.xlsx",
+          "parentId": null,
+          "ownerId": 1,
+          "bucketName": "netdisk",
+          "objectKey": "user-1/1770183748197_execl.xlsx",
+          "fileSize": 9856,
+          "contentType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          "fileExt": "xlsx",
+          "etag": "5ebbeef5afeab4e434d12bfa4de6e651",
+          "isDeleted": false,
+          "deletedAt": null,
+          "createTime": "2026-02-04T13:42:28",
+          "updateTime": "2026-02-04T13:42:28"
+        },
+        {
+          "id": 10,
+          "type": "FILE",
+          "name": "ppt.pptx",
+          "parentId": null,
+          "ownerId": 1,
+          "bucketName": "netdisk",
+          "objectKey": "user-1/1770183729891_ppt.pptx",
+          "fileSize": 101666,
+          "contentType": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+          "fileExt": "pptx",
+          "etag": "1ed750fb50a69f5d7937aec410e8c7c0",
+          "isDeleted": false,
+          "deletedAt": null,
+          "createTime": "2026-02-04T13:42:10",
+          "updateTime": "2026-02-04T13:42:10"
+        },
+        {
+          "id": 9,
+          "type": "FILE",
+          "name": "word.docx",
+          "parentId": null,
+          "ownerId": 1,
+          "bucketName": "netdisk",
+          "objectKey": "user-1/1770183713221_word.docx",
+          "fileSize": 56990,
+          "contentType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+          "fileExt": "docx",
+          "etag": "809acf7e3435eb17b132bfeb0eabbaeb",
+          "isDeleted": false,
+          "deletedAt": null,
+          "createTime": "2026-02-04T13:41:54",
+          "updateTime": "2026-02-04T13:41:54"
+        },
+        {
+          "id": 8,
+          "type": "FILE",
+          "name": "video.mp4",
+          "parentId": null,
+          "ownerId": 1,
+          "bucketName": "netdisk",
+          "objectKey": "user-1/1770183099660_video.mp4",
+          "fileSize": 1570024,
+          "contentType": "video/mp4",
+          "fileExt": "mp4",
+          "etag": "d9061d3da8601932e98f79ec8ba1c877",
+          "isDeleted": false,
+          "deletedAt": null,
+          "createTime": "2026-02-04T13:31:39",
+          "updateTime": "2026-02-04T13:31:39"
+        },
+        {
+          "id": 7,
+          "type": "FILE",
+          "name": "markdown.md",
+          "parentId": null,
+          "ownerId": 1,
+          "bucketName": "netdisk",
+          "objectKey": "user-1/1770182509035_markdown.md",
+          "fileSize": 3721,
+          "contentType": "",
+          "fileExt": "md",
+          "etag": "7eece7f6956b75dae345a51a085f4420",
+          "isDeleted": false,
+          "deletedAt": null,
+          "createTime": "2026-02-04T13:21:50",
+          "updateTime": "2026-02-04T13:21:50"
+        },
+        {
+          "id": 6,
+          "type": "FILE",
+          "name": "image.svg",
+          "parentId": null,
+          "ownerId": 1,
+          "bucketName": "netdisk",
+          "objectKey": "user-1/1770182245034_image.svg",
+          "fileSize": 932,
+          "contentType": "image/svg+xml",
+          "fileExt": "svg",
+          "etag": "0d38388fb4931a7bd31a4cd2ff82a7d5",
+          "isDeleted": false,
+          "deletedAt": null,
+          "createTime": "2026-02-04T13:17:25",
+          "updateTime": "2026-02-04T13:17:25"
+        }
+      ]
+    }
   }
 } as { [key: string]: any }, {
   get(target, prop) {
@@ -293,7 +472,7 @@ export default new Proxy({
         "msg": "success",
         "data": `${location.origin + location.pathname}samples/${arr[num]}`
       }
-    } else if(/^\/disk\/\d+\/(restore|forever)$/.test(prop as string)) {
+    } else if (/^\/disk\/\d+\/(restore|forever)$/.test(prop as string)) {
       return {
         "code": 200,
         "msg": "success",
