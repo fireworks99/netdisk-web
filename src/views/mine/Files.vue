@@ -2,16 +2,26 @@
   <div class="files_wrapper">
 
     <!-- 1. 上传文件与新建文件夹 -->
+    <div class="bc">
+      <Breadcrumb :breadcrumb-list="breadcrumbList" sepa="/" :clickable="true" @menu-click="cdUp" />
+    </div>
+
     <div class="header">
-      <div>
-        <Breadcrumb :breadcrumb-list="breadcrumbList" sepa="/" :clickable="true" @menu-click="cdUp" />
+      <div class="flex_center">
+        <el-input v-model="keyword" placeholder="输入文件名称" clearable @clear="loadTableData"
+          @keyup.enter.active="loadTableData">
+          <template #append>
+            <el-button icon="Search" @click="loadTableData"/>
+          </template>
+        </el-input>
       </div>
-      <div style="display: flex;">
-        <el-button icon="Back" @click="cdUp" v-show="path.length > 1">返回上级</el-button>
+      <div>
+        <el-button icon="Back" @click="cdUp" v-show="path.length > 1">返回</el-button>
         <el-button type="primary" icon="Plus" @click="dialogVisible = true">上传文件</el-button>
         <el-button icon="Plus" @click="handleAddFolder">新建文件夹</el-button>
       </div>
     </div>
+
 
     <!-- 2. 文件陈列展示 -->
     <el-table :data="files" @[eventName]="handleRowClick">
@@ -41,8 +51,8 @@
 
     <div class="flex_center" style="margin-top: 16px;">
       <el-pagination v-model:current-page="pageNum" v-model:page-size="pageSize" :page-sizes="[10, 20, 30, 40]"
-        layout="total, sizes, prev, pager, next, jumper" :total="total" @size-change="handleSizeChange"
-        @current-change="handleCurrentChange" />
+        layout="total, sizes, prev, pager, next" :total="total" @size-change="handleSizeChange"
+        @current-change="handleCurrentChange" size="small" />
     </div>
 
     <!-- 3. 上传文件对话框 -->
@@ -329,6 +339,10 @@ const handleDelete = async (row: DiskItem) => {
 
 <style lang="scss" scoped>
 .files_wrapper {
+  .bc {
+    margin-bottom: 16px;
+  }
+
   .header {
     display: flex;
     align-items: center;
@@ -341,10 +355,14 @@ const handleDelete = async (row: DiskItem) => {
 
 #app.mobile {
   .files_wrapper {
+    .bc {
+      display: flex;
+      justify-content: center;
+    }
+
     .header {
       flex-direction: column;
     }
   }
 }
-
 </style>
