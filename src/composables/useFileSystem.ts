@@ -32,6 +32,7 @@ export const useFileSystem = (initialPath?: DiskItem[]) => {
     return path.length > 1 ? path[path.length - 1]?.id : undefined;
   });
 
+  const multi = reactive<any[]>([]);
 
 
   // -------------------------- 文件面包屑 start  ------------------------
@@ -157,6 +158,7 @@ export const useFileSystem = (initialPath?: DiskItem[]) => {
   return {
     path,
     parentId,
+    multi,
 
     breadcrumbList,//面包屑
 

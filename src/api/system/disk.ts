@@ -89,3 +89,31 @@ export function getFByCondition(params: {}) {
     params
   })
 }
+
+// 批量下载
+export function batchDownloadAPI(data: {}) {
+  return request({
+    url: '/disk/batch/download',
+    method: 'post',
+    responseType: 'blob',
+    data
+  })
+}
+
+// 批量移动
+export function batchMoveAPI(data: {}) {
+  return request({
+    url: '/disk/batch/move',
+    method: 'post',
+    data
+  })
+}
+
+// 批量删除
+export function batchDeleteAPI(data: {}) {
+  return request({
+    url: '/disk/batch/delete',
+    method: 'post',
+    data
+  })
+}

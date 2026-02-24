@@ -34,7 +34,7 @@ import { onMounted, watch, ref } from 'vue';
 import type { PropType } from 'vue';
 import type { DiskItem } from '@/types';
 import { ElMessage } from 'element-plus';
-import { move } from '@/api/system/disk';
+import { move, batchMoveAPI } from '@/api/system/disk';
 
 const props = defineProps({
   curPath: {
@@ -47,8 +47,8 @@ const props = defineProps({
     default: false
   },
   moveWhich: {
-    type: Object,
-    default: null
+    type: Array as PropType<DiskItem[]>,
+    default: () => []
   }
 });
 
@@ -83,7 +83,7 @@ const dialogVisible = ref(props.moveVisiable);
 watch(
   () => props.moveVisiable,
   val => {
-    if(val) {
+    if (val) {
       path.splice(0, path.length, ...props.curPath);
       loadTableData();
     }
@@ -96,24 +96,46 @@ watch(dialogVisible, (val) => {
   emit('update:moveVisiable', val)
 });
 
-const handleMoveReally = async() => {
-  if(path.some(p => p.id === props.moveWhich.id)) {
-    ElMessage.warning("不能选择当前文件夹及其子孙文件夹");
-    return ;
-  }
-  if(path[path.length - 1]?.id === props.moveWhich.parentId 
-    || (path.length === 1 && props.moveWhich.parentId === null)) {
-    ElMessage.warning("当前文件（夹）就在这个位置，无需移动");
-    return ;
+const handleMoveReally = async () => {
+
+  if (props.moveWhich.length >= 1) {
+
+    // 公共检查
+    const which = props.moveWhich[0];
+    if (path.some(p => p.id === which?.id)) {
+      ElMessage.warning("不能选择当前文件夹及其子孙文件夹");
+      return;
+    }
+    if (path[path.length - 1]?.id === which?.parentId
+      || (path.length === 1 && which?.parentId === null)) {
+      ElMessage.warning("当前文件（夹）就在这个位置，无需移动");
+      return;
+    }
+
+    const pid = path[path.length - 1]?.id;
+    if (props.moveWhich.length === 1) {
+      // 单文件（夹）移动
+      try {
+        await move({ id: which?.id, parentId: pid === -1 ? null : pid });
+        dialogVisible.value = false;
+      } catch (e) {
+        ElMessage.error('移动失败: '+ e);
+      }
+    } else if (props.moveWhich.length > 1) {
+      // 多文件（夹）移动
+      try {
+        await batchMoveAPI({
+          itemIds: props.moveWhich.map(item => item.id),
+          targetParentId: pid === -1 ? null : pid
+        });
+        dialogVisible.value = false;
+      } catch (e) {
+        ElMessage.error('移动失败: '+ e);
+      }
+    }
   }
 
-  try {
-    const pid = path[path.length - 1]?.id;
-    await move({ id: props.moveWhich.id, parentId: pid === -1 ? null : pid });
-    dialogVisible.value = false;
-  } catch (e) {
-    ElMessage.error('移动失败');
-  }
+
 }
 
 </script>

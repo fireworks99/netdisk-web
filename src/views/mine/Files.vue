@@ -4,6 +4,11 @@
     <!-- 1. 上传文件与新建文件夹 -->
     <div class="bc">
       <Breadcrumb :breadcrumb-list="breadcrumbList" sepa="/" :clickable="true" @menu-click="cdUp" />
+      <div v-show="multi.length > 0">
+        <el-button @click="batchDownload">批量下载</el-button>
+        <el-button @click="batchMove">批量移动</el-button>
+        <el-button type="danger" @click="batchDelete">批量删除</el-button>
+      </div>
     </div>
 
     <div class="header">
@@ -11,7 +16,7 @@
         <el-input v-model="keyword" placeholder="输入文件名称" clearable @clear="loadTableData"
           @keyup.enter.active="loadTableData">
           <template #append>
-            <el-button icon="Search" @click="loadTableData"/>
+            <el-button icon="Search" @click="loadTableData" />
           </template>
         </el-input>
       </div>
@@ -24,7 +29,9 @@
 
 
     <!-- 2. 文件陈列展示 -->
-    <el-table :data="files" @[eventName]="handleRowClick">
+    <el-table :data="files" @[eventName]="handleRowClick"
+      @selection-change="(val: any[]) => multi.splice(0, multi.length, ...val)">
+      <el-table-column type="selection" width="28" />
       <el-table-column prop="name" label="文件名" show-overflow-tooltip>
         <template #default="scope">
           <div style="display: flex; align-items: center; gap: 8px;">
@@ -33,7 +40,7 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column prop="fileSize" label="大小" align="center"
+      <el-table-column prop="fileSize" label="大小" align="center" v-if="!layoutStore.isMobile"
         :formatter="(_: any, __: any, cell: string) => formatBytes(cell)" />
       <el-table-column prop="createTime" label="上传时间" align="center" v-if="!layoutStore.isMobile"
         :formatter="(_: any, __: any, cell: any) => dayjs(cell).format('YYYY-MM-DD HH:mm:ss')" />
@@ -95,7 +102,7 @@
 
 <script setup lang="ts">
 // Vue核心
-import { ref, onMounted, defineAsyncComponent, watch } from 'vue';
+import { ref, onMounted, defineAsyncComponent, watch, reactive } from 'vue';
 
 // 第三方库
 import dayjs from 'dayjs';
@@ -104,13 +111,16 @@ import { ElMessage, genFileId } from 'element-plus';
 import type { UploadInstance, UploadProps, UploadRawFile } from 'element-plus';
 
 // 自定义工具
-import { formatBytes, downloadMinIOFile } from '@/utils';
+import { formatBytes, downloadMinIOFile, downloadByBlob } from '@/utils';
 
 // 自定义组件
 import Breadcrumb from '@/components/Breadcrumb.vue';
 
 // API
-import { getUploadInfo, saveFileInfo, getPDUrl, addFolder, deleteF } from '@/api/system/disk';
+import {
+  getUploadInfo, saveFileInfo, getPDUrl, addFolder, deleteF,
+  batchDownloadAPI, batchDeleteAPI
+} from '@/api/system/disk';
 
 // 类型声明
 import type { DiskItem } from '@/types';
@@ -121,6 +131,7 @@ import { useFileSystem } from '@/composables/useFileSystem';
 const {
   path,
   parentId,
+  multi,
 
   breadcrumbList,//面包屑
 
@@ -293,10 +304,10 @@ const MoveDest = defineAsyncComponent(() =>
   import('@/components/MoveDest.vue')
 );
 const moveVisiable = ref(false);
-const moveWhich = ref();
+const moveWhich = reactive<any[]>([]);
 const handleMove = async (row: DiskItem) => {
   moveVisiable.value = true;
-  moveWhich.value = row;
+  moveWhich.splice(0, moveWhich.length, row);
 };
 watch(
   () => moveVisiable.value,
@@ -335,14 +346,81 @@ const handleDelete = async (row: DiskItem) => {
     })
 }
 // ----------------- 删除文件（夹）end -------------------
+
+
+
+// ----------------- 批量下载 start -----------------
+const batchDownload = async () => {
+  try {
+    const res = await batchDownloadAPI({
+      itemIds: multi.map(item => item.id)
+    });
+    const disposition = res.headers['content-disposition'];
+    let fileName = 'download.zip';
+
+    if (disposition) {
+      const match = disposition.match(/filename="?(.+)"?/);
+      if (match?.[1]) {
+        fileName = decodeURIComponent(match[1]);
+      }
+    }
+    const blob = new Blob([res.data], {
+      type: 'application/zip'
+    });
+    downloadByBlob(blob, fileName);
+
+  } catch (e) {
+    console.log("批量下载失败", e);
+  }
+}
+// ----------------- 批量下载 end -------------------
+
+
+
+// ----------------- 批量移动 start -----------------
+const batchMove = () => {
+  moveVisiable.value = true;
+  moveWhich.splice(0, moveWhich.length, ...multi);
+}
+// ----------------- 批量移动 end -------------------
+
+
+
+// ----------------- 批量删除 start -----------------
+const batchDelete = () => {
+  ElMessageBox.confirm(
+    `确认删除所选文件（夹）吗？`,
+    '提示',
+    {
+      confirmButtonText: '确认',
+      cancelButtonText: '取消',
+      type: 'warning',
+    }
+  )
+    .then(async () => {
+      await batchDeleteAPI({
+        itemIds: multi.map(item => item.id)
+      });
+      loadTableData();
+      ElMessage({
+        type: 'success',
+        message: '删除成功',
+      });
+    })
+    .catch(() => {
+      ElMessage({
+        type: 'info',
+        message: '未删除',
+      });
+    });
+}
+// ----------------- 批量删除 end -------------------
 </script>
 
 <style lang="scss" scoped>
 .files_wrapper {
-  .bc {
-    margin-bottom: 16px;
-  }
 
+  .bc,
   .header {
     display: flex;
     align-items: center;
@@ -355,11 +433,8 @@ const handleDelete = async (row: DiskItem) => {
 
 #app.mobile {
   .files_wrapper {
-    .bc {
-      display: flex;
-      justify-content: center;
-    }
 
+    .bc,
     .header {
       flex-direction: column;
     }
