@@ -26,10 +26,26 @@ export function getUploadInfo(data: { originalName: string, contentType: string,
   })
 }
 
+export function getBatchUploadInfo(data: { originalName: string, contentType: string, size: number }[]) {
+  return request({
+    url: '/disk/batch/upload-url',
+    method: 'post',
+    data
+  })
+}
+
 // 保存文件信息
 export function saveFileInfo(data: {}) {
   return request({
     url: '/disk/file',
+    method: 'post',
+    data
+  })
+}
+
+export function batchSaveFileInfo(data: {}[]) {
+  return request({
+    url: '/disk/batch/file',
     method: 'post',
     data
   })

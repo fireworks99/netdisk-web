@@ -66,15 +66,15 @@
     <el-dialog v-model="dialogVisible" title="文件上传" width="460">
 
       <!-- 上传区域 -->
-      <el-upload ref="upload" drag action="" :limit="1" :on-exceed="handleExceed" :auto-upload="false"
-        @change="handleFileChange">
+      <!-- <el-upload ref="upload" drag action="" :limit="1" :on-exceed="handleExceed" :auto-upload="false" @change="handleFileChange"> -->
+      <el-upload ref="upload" drag action="" multiple :auto-upload="false" @change="handleFileChange">
         <el-icon class="el-icon--upload"><upload-filled /></el-icon>
         <div class="el-upload__text">
           将文件拖到此处，或 <em>点击上传</em>
         </div>
         <template #tip>
           <div class="el-upload__tip">
-            单次只能上传一个文件
+            <!-- 单次只能上传一个文件 -->
           </div>
         </template>
       </el-upload>
@@ -107,7 +107,7 @@ import { ref, onMounted, defineAsyncComponent, watch, reactive } from 'vue';
 // 第三方库
 import dayjs from 'dayjs';
 import axios from 'axios';
-import { ElMessage, genFileId } from 'element-plus';
+import { ElMessage } from 'element-plus';
 import type { UploadInstance, UploadProps, UploadRawFile } from 'element-plus';
 
 // 自定义工具
@@ -118,7 +118,7 @@ import Breadcrumb from '@/components/Breadcrumb.vue';
 
 // API
 import {
-  getUploadInfo, saveFileInfo, getPDUrl, addFolder, deleteF,
+  getBatchUploadInfo, batchSaveFileInfo, getPDUrl, addFolder, deleteF,
   batchDownloadAPI, batchDeleteAPI
 } from '@/api/system/disk';
 
@@ -205,65 +205,75 @@ const dialogVisible = ref(false);
 
 const upload = ref<UploadInstance>();
 
-let selectedFile: UploadRawFile | null = null;
+let selectedFiles: UploadRawFile[] = [];
 
 const handleFileChange: UploadProps['onChange'] = (file) => {
-  selectedFile = file.raw || null;
-}
-
-const handleExceed: UploadProps['onExceed'] = (files) => {
-  upload.value!.clearFiles();
-  const file = files[0] as UploadRawFile;
-  file.uid = genFileId();
-  upload.value!.handleStart(file);
+  if (file.raw) {
+    selectedFiles.push(file.raw);
+  }
 }
 
 const handleUpload = async () => {
-  if (!selectedFile) {
+  if (!selectedFiles || selectedFiles.length === 0) {
     ElMessage.warning('请先选择要上传的文件');
     return;
   }
 
   try {
-    const result = await getUploadInfo({
-      "originalName": selectedFile.name,
-      "contentType": selectedFile.type,
-      "size": selectedFile.size
+    const list: { originalName: string, contentType: string, size: number }[] = [];
+    selectedFiles.forEach(f => {
+      list.push({
+        "originalName": f.name,
+        "contentType": f.type,
+        "size": f.size
+      });
     });
+    const result = await getBatchUploadInfo(list);
 
-    const { objectName, uploadUrl } = result.data.data;
+    const infoList = result.data.data;
 
-    let putRes = { headers: { etag: '' } };
+    if (!window.APP_CONFIG.USE_MOCK) {
+      const promiseList: Promise<any>[] = [];
+      infoList.forEach((info: { uploadUrl: string }, index: number) => {
+        promiseList.push(axios.put(info.uploadUrl, selectedFiles[index], {
+          headers: {
+            'Content-Type': selectedFiles[index]?.type
+          },
+          onUploadProgress: (e) => {
+            const percent = Math.round((e.loaded / e.total!) * 100)
+            console.log('上传进度:', percent)
+          }
+        }))
+      });
+      Promise.all(promiseList).then(async results => {
+        const list: {}[] = [];
+        results.forEach((res, index) => {
+          const etag = res.headers['etag']?.replace(/"/g, '');
+          list.push({
+            "name": selectedFiles[index]?.name,
+            "parentId": parentId.value,
+            "bucketName": window.APP_CONFIG.BUCKET,
+            "objectKey": infoList[index].objectName,
+            "fileSize": selectedFiles[index]?.size,
+            "contentType": selectedFiles[index]?.type,
+            "fileExt": selectedFiles[index]?.name.split('.').pop()?.toLowerCase(),
+            etag,
+          });
+        });
 
-    !window.APP_CONFIG.USE_MOCK && (putRes = await axios.put(uploadUrl, selectedFile, {
-      headers: {
-        'Content-Type': selectedFile.type
-      },
-      onUploadProgress: (e) => {
-        const percent = Math.round((e.loaded / e.total!) * 100)
-        console.log('上传进度:', percent)
-      }
-    }));
+        await batchSaveFileInfo(list);
 
-    const etag = putRes.headers['etag']?.replace(/"/g, '');
+        // 失败会抛出异常，不会执行到这里
+        ElMessage.success("文件上传成功");
+        dialogVisible.value = false;
+        upload.value?.clearFiles();
+        selectedFiles = [];
+        await loadTableData();
+      }).catch(error => {
+        console.log('上传失败: ', error);
+      });
+    }
 
-    await saveFileInfo({
-      "name": selectedFile.name,
-      "parentId": parentId.value,
-      "bucketName": window.APP_CONFIG.BUCKET,
-      "objectKey": objectName,
-      "fileSize": selectedFile.size,
-      "contentType": selectedFile.type,
-      "fileExt": selectedFile.name.split('.').pop()?.toLowerCase(),
-      etag,
-    });
-
-    // 失败会抛出异常，不会执行到这里
-    ElMessage.success("文件上传成功");
-    dialogVisible.value = false;
-    upload.value?.clearFiles();
-    selectedFile = null;
-    await loadTableData();
   } catch (error) {
     console.error('文件上传失败:', error);
   }
