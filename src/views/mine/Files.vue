@@ -66,18 +66,36 @@
     <el-dialog v-model="dialogVisible" title="文件上传" width="460">
 
       <!-- 上传区域 -->
-      <!-- <el-upload ref="upload" drag action="" :limit="1" :on-exceed="handleExceed" :auto-upload="false" @change="handleFileChange"> -->
-      <el-upload ref="upload" drag action="" multiple :auto-upload="false" @change="handleFileChange">
-        <el-icon class="el-icon--upload"><upload-filled /></el-icon>
-        <div class="el-upload__text">
-          将文件拖到此处，或 <em>点击上传</em>
-        </div>
-        <template #tip>
-          <div class="el-upload__tip">
-            <!-- 单次只能上传一个文件 -->
-          </div>
-        </template>
-      </el-upload>
+      <el-tabs v-model="activeName">
+        <el-tab-pane label="选择文件" name="first">
+
+          <!-- 如果不写v-model，就变成v-bind了！ -->
+          <el-upload ref="upload" drag action="" multiple :auto-upload="false" v-model:file-list="fileList">
+            <el-icon class="el-icon--upload"><upload-filled /></el-icon>
+            <div class="el-upload__text">
+              将文件拖到此处，或 <em>点击上传</em>
+            </div>
+            <template #tip>
+              <div class="el-upload__tip">
+                <!-- 单次只能上传一个文件 -->
+              </div>
+            </template>
+          </el-upload>
+
+        </el-tab-pane>
+
+        <el-tab-pane label="选择文件夹" name="second">
+
+          <el-upload ref="upload2" drag action="" directory multiple :auto-upload="false" v-model:file-list="fileList2">
+            <el-icon class="el-icon--upload"><upload-filled /></el-icon>
+            <div class="el-upload__text">
+              将文件夹拖到此处，或 <em>点击上传</em>
+            </div>
+          </el-upload>
+
+        </el-tab-pane>
+      </el-tabs>
+
 
       <!-- 上传按钮 -->
       <template #footer>
@@ -108,7 +126,7 @@ import { ref, onMounted, defineAsyncComponent, watch, reactive } from 'vue';
 import dayjs from 'dayjs';
 import axios from 'axios';
 import { ElMessage } from 'element-plus';
-import type { UploadInstance, UploadProps, UploadRawFile } from 'element-plus';
+import type { UploadInstance, UploadRawFile } from 'element-plus';
 
 // 自定义工具
 import { formatBytes, downloadMinIOFile, downloadByBlob } from '@/utils';
@@ -201,27 +219,51 @@ const handlePreview = async (row: DiskItem) => {
 
 
 // ----------------- 上传文件 start -----------------
+import type { UploadFile } from 'element-plus';
+
 const dialogVisible = ref(false);
+
+const activeName = ref('first');
 
 const upload = ref<UploadInstance>();
 
-let selectedFiles: UploadRawFile[] = [];
+const fileList = ref([]);
 
-const handleFileChange: UploadProps['onChange'] = (file) => {
-  if (file.raw) {
-    selectedFiles.push(file.raw);
-  }
-}
+const selectedFiles: UploadRawFile[] = [];
+
+watch(
+  () => fileList.value, 
+  val => {
+    selectedFiles.splice(0, selectedFiles.length, ...val.map((f: UploadFile) => f.raw as UploadRawFile))
+});
+
+const upload2 = ref<UploadInstance>();
+
+const fileList2 = ref([]);
+
+const selectedFiles2: UploadRawFile[] = [];
+
+watch(
+  () => fileList2.value, 
+  val => {
+    selectedFiles2.splice(0, selectedFiles2.length, ...val.map((f: UploadFile) => f.raw as UploadRawFile))
+});
+
+
 
 const handleUpload = async () => {
-  if (!selectedFiles || selectedFiles.length === 0) {
+
+  const aimFiles = activeName.value === 'first' ? selectedFiles : selectedFiles2;
+
+
+  if (!aimFiles || aimFiles.length === 0) {
     ElMessage.warning('请先选择要上传的文件');
     return;
   }
 
   try {
     const list: { originalName: string, contentType: string, size: number }[] = [];
-    selectedFiles.forEach(f => {
+    aimFiles.forEach(f => {
       list.push({
         "originalName": f.name,
         "contentType": f.type,
@@ -235,9 +277,9 @@ const handleUpload = async () => {
     if (!window.APP_CONFIG.USE_MOCK) {
       const promiseList: Promise<any>[] = [];
       infoList.forEach((info: { uploadUrl: string }, index: number) => {
-        promiseList.push(axios.put(info.uploadUrl, selectedFiles[index], {
+        promiseList.push(axios.put(info.uploadUrl, aimFiles[index], {
           headers: {
-            'Content-Type': selectedFiles[index]?.type
+            'Content-Type': aimFiles[index]?.type
           },
           onUploadProgress: (e) => {
             const percent = Math.round((e.loaded / e.total!) * 100)
@@ -250,13 +292,13 @@ const handleUpload = async () => {
         results.forEach((res, index) => {
           const etag = res.headers['etag']?.replace(/"/g, '');
           list.push({
-            "name": selectedFiles[index]?.name,
+            "name": aimFiles[index]?.name,
             "parentId": parentId.value,
             "bucketName": window.APP_CONFIG.BUCKET,
             "objectKey": infoList[index].objectName,
-            "fileSize": selectedFiles[index]?.size,
-            "contentType": selectedFiles[index]?.type,
-            "fileExt": selectedFiles[index]?.name.split('.').pop()?.toLowerCase(),
+            "fileSize": aimFiles[index]?.size,
+            "contentType": aimFiles[index]?.type,
+            "fileExt": aimFiles[index]?.name.split('.').pop()?.toLowerCase(),
             etag,
           });
         });
@@ -267,7 +309,8 @@ const handleUpload = async () => {
         ElMessage.success("文件上传成功");
         dialogVisible.value = false;
         upload.value?.clearFiles();
-        selectedFiles = [];
+        upload2.value?.clearFiles();
+        aimFiles.splice(0, aimFiles.length);
         await loadTableData();
       }).catch(error => {
         console.log('上传失败: ', error);
