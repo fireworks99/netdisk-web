@@ -25,8 +25,8 @@
 
     <div class="flex_center" style="margin-top: 16px;">
       <el-pagination v-model:current-page="pageNum" v-model:page-size="pageSize" :page-sizes="[10, 20, 30, 40]"
-        layout="total, sizes, prev, pager, next, jumper" :total="total" @size-change="handleSizeChange"
-        @current-change="handleCurrentChange" />
+        layout="total, sizes, prev, pager, next" :total="total" @size-change="handleSizeChange"
+        @current-change="handleCurrentChange" size="small"/>
     </div>
   </div>
 </template>

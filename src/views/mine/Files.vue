@@ -47,10 +47,21 @@
       <el-table-column label="操作" align="center" width="188">
         <template #default="{ row }">
           <div class="table-operations">
-            <el-button size="small" @click.stop="handleDownload(row)" v-if="row.type === 'FILE'">下载</el-button>
-            <el-button size="small" @click.stop="handlePreview(row)" v-if="row.type === 'FILE'">预览</el-button>
+            <!-- <el-button size="small" @click.stop="handleDownload(row)" v-if="row.type === 'FILE'">下载</el-button> -->
+            <!-- <el-button size="small" @click.stop="handlePreview(row)" v-if="row.type === 'FILE'">预览</el-button> -->
             <el-button size="small" @click.stop="handleMove(row)">移动</el-button>
             <el-button size="small" type="danger" @click.stop="handleDelete(row)">删除</el-button>
+            
+            <el-dropdown placement="bottom-end" v-if="row.type === 'FILE'">
+              <el-button size="small"> 更多 </el-button>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item @click.stop="handleDownload(row)">下载</el-dropdown-item>
+                  <el-dropdown-item @click.stop="handlePreview(row)">预览</el-dropdown-item>
+                  <el-dropdown-item @click.stop="handleFavorite(row)">收藏</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
           </div>
         </template>
       </el-table-column>
@@ -232,10 +243,10 @@ const fileList = ref([]);
 const selectedFiles: UploadRawFile[] = [];
 
 watch(
-  () => fileList.value, 
+  () => fileList.value,
   val => {
     selectedFiles.splice(0, selectedFiles.length, ...val.map((f: UploadFile) => f.raw as UploadRawFile))
-});
+  });
 
 const upload2 = ref<UploadInstance>();
 
@@ -244,10 +255,10 @@ const fileList2 = ref([]);
 const selectedFiles2: UploadRawFile[] = [];
 
 watch(
-  () => fileList2.value, 
+  () => fileList2.value,
   val => {
     selectedFiles2.splice(0, selectedFiles2.length, ...val.map((f: UploadFile) => f.raw as UploadRawFile))
-});
+  });
 
 
 
@@ -468,6 +479,21 @@ const batchDelete = () => {
     });
 }
 // ----------------- 批量删除 end -------------------
+
+
+
+// ----------------- 收藏 start -------------------
+import { setFavorite } from '@/api/system/favorite';
+
+const handleFavorite = async (row: DiskItem) => {
+  try {
+    const res = await setFavorite(row.id);
+    ElMessage.success(res.data.msg);
+  } catch (e) {
+    console.log(e);
+  }
+}
+// ----------------- 收藏 end ---------------------
 </script>
 
 <style lang="scss" scoped>
