@@ -1,1 +1,0 @@
-import{s as e}from"./request-Dl_UtJCb.js";function o(r){return e({url:"/favorite/page",params:r})}function a(r){return e({url:`/favorite/${r}`,method:"post"})}function i(r){return e({url:`/favorite/${r}`,method:"delete"})}export{o as g,i as r,a as s};

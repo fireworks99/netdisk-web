@@ -1,1 +1,0 @@
-import{_ as e}from"./_plugin-vue_export-helper-DlAUqK2U.js";import{c,o as r}from"./index-Byf2vgSR.js";const o={};function t(n,s){return r(),c("div",null,"安全设置")}const f=e(o,[["render",t]]);export{f as default};
