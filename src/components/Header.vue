@@ -12,12 +12,28 @@
       </div>
 
       <div class="bread_wrapper">
-        <Breadcrumb :breadcrumb-list="breadcrumbList"/>
+        <Breadcrumb :breadcrumb-list="breadcrumbList" />
       </div>
 
     </div>
     <div class="middle" v-if="!layoutStore.isMobile">{{ clcokText }}</div>
-    <div class="right"></div>
+    <div class="right">
+
+      <div class="avatar_wrapper flex_center">
+        
+        <el-dropdown placement="bottom-end">
+          <img src="@/assets/images/avatar.svg" alt="" style="cursor: pointer;">
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item>个人信息</el-dropdown-item>
+              <el-dropdown-item>退出登录</el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+
+      </div>
+
+    </div>
 
   </div>
 </template>
@@ -32,11 +48,11 @@ import Breadcrumb from './Breadcrumb.vue';
 import { useRoute } from 'vue-router';
 const route = useRoute();
 const breadcrumbList = computed(() => {
-  return route.matched.filter(item => item.meta && item.meta.title).map(item => ({
-      title: item.meta.title as string,  // 确保 title 存在
-      path: item.path as string,
-      icon: item.meta.icon as Object  // 如果有 icon 字段
-    }));
+  return route.matched.filter(item => item.meta && item.meta.title && item.meta.title !== '首页').map(item => ({
+    title: item.meta.title as string,  // 确保 title 存在
+    path: item.path as string,
+    icon: item.meta.icon as Object  // 如果有 icon 字段
+  }));
 });
 
 import { useLayoutStore } from '@/store/layout';
@@ -116,6 +132,10 @@ onBeforeUnmount(() => {
 
   .middle {
     color: $secondary-text-color;
+  }
+
+  .right {
+    margin-right: 16px;
   }
 }
 </style>

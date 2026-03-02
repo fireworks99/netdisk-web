@@ -116,15 +116,17 @@ export const useFileSystem = (initialPath?: DiskItem[]) => {
   const total = ref(0);
 
   const loadTableData = async () => {
-    const res = await getFByCondition({
-      parentId: parentId.value,
-      keyword: keyword.value,
-      deleted: deleted.value,
-      pageNum: pageNum.value,
-      pageSize: pageSize.value
-    });
-    files.value = res.data.data.records;
-    total.value = res.data.data.total;
+    try {
+      const res = await getFByCondition({
+        parentId: parentId.value,
+        keyword: keyword.value,
+        deleted: deleted.value,
+        pageNum: pageNum.value,
+        pageSize: pageSize.value
+      });
+      files.value = res.data.data.records;
+      total.value = res.data.data.total;
+    } catch (e) {}
   }
 
   const handleCurrentChange = () => {

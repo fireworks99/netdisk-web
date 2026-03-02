@@ -1,11 +1,11 @@
-import { createRouter, createWebHashHistory  } from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 import * as Icons from '@element-plus/icons-vue'
 
-const routes = [
+const sidebarRoutes = [
   {
     path: '/',
-    meta: { title: '首页', icon: Icons['HomeFilled'], hidden: true },
-    component: () => import("@/views/Overview.vue")
+    meta: { title: '总览', icon: Icons['Orange'], hidden: true },
+    component: () => import("@/views/Overview.vue"),
   },
   {
     path: '/mine',
@@ -69,10 +69,24 @@ const routes = [
         component: () => import("@/views/sys/Permission.vue")
       }
     ]
+  }
+];
+
+const routes = [
+  {
+    path: '/lr',
+    meta: { title: '', icon: Icons['UserFilled'], hidden: true },
+    component: () => import("@/views/LR.vue")
   },
+  {
+    path: '/',
+    meta: { title: '首页', icon: Icons['HomeFilled'], hidden: true },
+    component: () => import("@/views/Home.vue"),
+    children: sidebarRoutes
+  }
 ]
 
-export { routes }
+export { sidebarRoutes }
 
 const router = createRouter({
   // history: createWebHistory(import.meta.env.BASE_URL),

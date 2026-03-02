@@ -2,6 +2,8 @@ import axios from "axios";
 import mockAdapter from '@/api/mock';
 import { ElMessage, ElNotification } from 'element-plus';
 import type { AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
+import router from "@/router";
+import dayjs from 'dayjs';
 
 // 扩展 axios 配置类型
 declare module 'axios' {
@@ -39,6 +41,11 @@ service.interceptors.request.use(config => {
 
     // 替换为mock适配器
     customConfig.adapter = mockAdapter;
+  } else {
+    const token = localStorage.getItem('token');
+    if (token && router.currentRoute.value.path !== "/lr") {
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
   }
 
   return config;
@@ -47,7 +54,7 @@ service.interceptors.request.use(config => {
   Promise.reject(error);
 })
 
-const errorCode: Record<number | 'default', string>  = {
+const errorCode: Record<number | 'default', string> = {
   401: '认证失败，无法访问系统资源',
   403: '当前操作没有权限',
   404: '访问资源不存在',
@@ -65,14 +72,14 @@ service.interceptors.response.use(
     const code = res.data && res.data.code || 200;
     // 获取错误信息
     const msg = res.data.msg || errorCode[code] || errorCode['default'];
-    
-    
+
+
     // 二进制数据(保留headers)
     if (res.request.responseType === 'blob' || res.request.responseType === 'arraybuffer') {
       return res;
     }
-    
-    if (code === 401) {//未认证，跳转登录
+
+    if (code === 401) {
       ElMessage({ message: '无效的会话，或者会话已过期，请重新登录。', type: 'warning' });
       return Promise.reject();
     } else if (code === 500) {
@@ -91,9 +98,25 @@ service.interceptors.response.use(
   },
   error => {
     console.log('响应拦截器: ' + error);
-    let { message } = error;
-    
-    if (message == "Network Error") {
+    let { status, message } = error;
+
+    if (message === "Network Error") {
+      message = "网络错误";
+      if (router.currentRoute.value.path !== "/lr") {
+        router.replace('/lr').catch(() => { });
+      }
+    } else if ([401, 403].includes(status)) {
+      const token = localStorage.getItem("token");
+      const token_exp = localStorage.getItem("token_exp");
+      if (token && dayjs().isBefore(dayjs(token_exp))) {
+        message = "权限不足";
+      } else {
+        message = "未登录，请先登录";
+        if (router.currentRoute.value.path !== "/lr") {
+          router.replace('/lr').catch(() => { });
+        }
+      }
+    } else if (message == "Network Error") {
       message = "后端接口连接异常";
     } else if (message.includes("timeout")) {
       message = "系统接口请求超时";

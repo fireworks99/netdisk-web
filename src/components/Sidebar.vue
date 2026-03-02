@@ -14,7 +14,7 @@
 
         <el-menu router :default-active="$route.path" :default-openeds="openeds">
 
-          <div v-for="item in routes" :key="item.path">
+          <div v-for="item in sidebarRoutes" :key="item.path">
 
             <div v-if="!item.meta.hidden">
 
@@ -56,7 +56,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { routes } from '@/router';
+import { sidebarRoutes } from '@/router';
 import { useLayoutStore } from '@/store/layout';
 
 const openeds = ref(['/mine', '/user', '/sys']);

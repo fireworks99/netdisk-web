@@ -1,9 +1,8 @@
 <template>
-  <Home />
+  <router-view />
 </template>
 
 <script setup lang="ts">
-import Home from '@/views/Home.vue';
 import { onMounted, onBeforeUnmount, watch } from 'vue';
 import { useLayoutStore } from '@/store/layout';
 
