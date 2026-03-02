@@ -20,13 +20,13 @@
     <div class="right">
 
       <div class="avatar_wrapper flex_center">
-        
+
         <el-dropdown placement="bottom-end">
           <img src="@/assets/images/avatar.svg" alt="" style="cursor: pointer;">
           <template #dropdown>
             <el-dropdown-menu>
-              <el-dropdown-item>个人信息</el-dropdown-item>
-              <el-dropdown-item>退出登录</el-dropdown-item>
+              <el-dropdown-item @click="jumpToProfile">个人信息</el-dropdown-item>
+              <el-dropdown-item @click="logout">退出登录</el-dropdown-item>
             </el-dropdown-menu>
           </template>
         </el-dropdown>
@@ -98,6 +98,34 @@ onBeforeUnmount(() => {
 })
 // -------------------------- 时钟 end  --------------------------
 
+
+
+// -------------------------- 用户 start --------------------------
+import router from '@/router';
+import { ElMessage, ElMessageBox } from 'element-plus';
+const jumpToProfile = () => {
+  router.replace("/user/profile").catch(() => { });
+};
+
+const logout = () => {
+  ElMessageBox.confirm('确定退出登录吗？', '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+  }).then(() => {
+
+    localStorage.removeItem("token");
+    localStorage.removeItem("token_exp");
+    localStorage.removeItem("userId");
+    localStorage.removeItem("username");
+    router.replace('/lr').catch(() => { });
+    ElMessage.success("退出登录");
+
+  }).catch(() => {
+    ElMessage.info('取消退出登录');
+  });
+}
+// -------------------------- 用户 end ----------------------------
 </script>
 
 <style lang="scss" scoped>
