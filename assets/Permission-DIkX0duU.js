@@ -1,1 +1,0 @@
-import{_ as e}from"./_plugin-vue_export-helper-DlAUqK2U.js";import{c as o,o as r}from"./index-CGpDsZHO.js";const c={};function n(t,s){return r(),o("div",null,"权限管理")}const f=e(c,[["render",n]]);export{f as default};

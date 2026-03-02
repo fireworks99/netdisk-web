@@ -1,1 +1,0 @@
-import{_ as e}from"./_plugin-vue_export-helper-DlAUqK2U.js";import{c as o,o as c}from"./index-CGpDsZHO.js";const r={};function t(n,s){return c(),o("div",null,"角色管理")}const f=e(r,[["render",t]]);export{f as default};

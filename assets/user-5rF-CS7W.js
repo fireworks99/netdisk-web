@@ -1,0 +1,1 @@
+import{s as e}from"./request-_p07GDwv.js";function o(r,t){return e({url:"/auth/login",method:"post",data:{username:r,password:t}})}function u(r,t){return e({url:"/auth/register",method:"post",data:{username:r,password:t}})}function a(r){return e({url:"/user/page",params:r})}export{a as g,o as l,u as r};
