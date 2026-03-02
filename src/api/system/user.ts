@@ -15,3 +15,10 @@ export function registerAPI(username: string, password: string) {
     data: { username, password }
   })
 }
+
+export function getUsers(params: {}) {
+  return request({
+    url: '/user/page',
+    params
+  })
+}
