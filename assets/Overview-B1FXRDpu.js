@@ -1,1 +1,0 @@
-import{_ as e}from"./_plugin-vue_export-helper-DlAUqK2U.js";import{c as r,o as c}from"./index-DP8Z4sB8.js";const o={};function t(n,s){return c(),r("div",null,"看板")}const f=e(o,[["render",t]]);export{f as default};
