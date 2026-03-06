@@ -46,6 +46,8 @@ const handleLogin = async() => {
     localStorage.setItem("username", info.username);
     localStorage.setItem("token", info.token);
     localStorage.setItem("token_exp", info.expiration);
+    localStorage.setItem("roles", info.roles);
+    localStorage.setItem("perms", info.perms);
 
     router.push("/");
   } catch (e) {
