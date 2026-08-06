@@ -1,4 +1,4 @@
-{
+window.APP_CONFIG = {
   "BASE_API": "http://localhost:8080",
   "USE_MOCK": false,
   "BUCKET": "netdisk"
