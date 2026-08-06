@@ -8,25 +8,15 @@ import 'element-plus/dist/index.css'
 import '@/assets/styles/index.scss'
 import * as ElementPlusIcons from '@element-plus/icons-vue'
 
-async function bootstrap() {
-  const baseUrl = import.meta.env.BASE_URL
-  const res = await fetch(`${baseUrl}config.json`)
-  const config = await res.json()
 
-  window.APP_CONFIG = config
+const app = createApp(App)
 
-  const app = createApp(App)
-
-  for (const [key, component] of Object.entries(ElementPlusIcons)) {
-    app.component(key, component)
-  }
-
-  app.use(createPinia())
-  app.use(router)
-  app.use(ElementPlus, { locale: zhCn })
-
-  app.mount('#app')
+for (const [key, component] of Object.entries(ElementPlusIcons)) {
+  app.component(key, component)
 }
 
-bootstrap()
+app.use(createPinia())
+app.use(router)
+app.use(ElementPlus, { locale: zhCn })
 
+app.mount('#app')
