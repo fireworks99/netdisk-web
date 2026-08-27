@@ -3,7 +3,6 @@ import mockAdapter from '@/api/mock';
 import { ElMessage, ElNotification } from 'element-plus';
 import type { AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 import router from "@/router";
-import dayjs from 'dayjs';
 
 // 扩展 axios 配置类型
 declare module 'axios' {
@@ -79,10 +78,7 @@ service.interceptors.response.use(
       return res;
     }
 
-    if (code === 401) {
-      ElMessage({ message: '无效的会话，或者会话已过期，请重新登录。', type: 'warning' });
-      return Promise.reject();
-    } else if (code === 500) {
+    if (code === 500) {
       ElMessage({ message: msg, type: 'error' });
       return Promise.reject(new Error(msg));
     } else if (code !== 200) {
@@ -97,33 +93,48 @@ service.interceptors.response.use(
     }
   },
   error => {
-    console.log('响应拦截器: ' + error);
-    let { status, message } = error;
+    console.log('响应拦截器:', error);
+
+    const status = error.response?.status;
+    let message = error.message;
 
     if (message === "Network Error") {
       message = "网络错误";
+
       if (router.currentRoute.value.path !== "/lr") {
         router.replace('/lr').catch(() => { });
       }
-    } else if ([401, 403].includes(status)) {
-      const token = localStorage.getItem("token");
-      const token_exp = localStorage.getItem("token_exp");
-      if (token && dayjs().isBefore(dayjs(token_exp))) {
-        message = "权限不足";
-      } else {
-        message = "未登录，请先登录";
-        if (router.currentRoute.value.path !== "/lr") {
-          router.replace('/lr').catch(() => { });
-        }
+
+    } else if (status === 401) {
+
+      message = "未登录或登录已过期";
+
+      localStorage.removeItem("token");
+      localStorage.removeItem("token_exp");
+
+      if (router.currentRoute.value.path !== "/lr") {
+        router.replace('/lr').catch(() => { });
       }
-    } else if (message == "Network Error") {
-      message = "后端接口连接异常";
+
+    } else if (status === 403) {
+
+      message = "当前操作没有权限";
+
     } else if (message.includes("timeout")) {
+
       message = "系统接口请求超时";
-    } else if (message.includes("Request failed with status code")) {
-      message = "系统接口" + message.slice(-3) + "异常";
+
+    } else if (status) {
+
+      message = `系统接口 ${status} 异常`;
     }
-    ElMessage({ message: message, type: 'error', duration: 5 * 1000 });
+
+    ElMessage({
+      message,
+      type: 'error',
+      duration: 5000
+    });
+
     return Promise.reject(error);
   }
 );
