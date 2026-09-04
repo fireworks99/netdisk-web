@@ -1,0 +1,1 @@
+import{Q as e}from"./index-DBdVIOL9.js";const t=e("user",{state:()=>({userId:null,username:"",roles:[],perms:[]}),actions:{setUserInfo(s){this.userId=s.userId,this.username=s.username,this.roles=s.roles,this.perms=s.perms},clearUserInfo(){this.userId=null,this.username="",this.roles=[],this.perms=[]}}});export{t as u};
