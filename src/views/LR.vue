@@ -20,9 +20,11 @@
 import { ref } from 'vue';
 import { loginAPI, registerAPI } from '@/api/system/user';
 import { ElMessage } from 'element-plus';
-import { useRouter } from 'vue-router'
+import { useRouter } from 'vue-router';
+import { useUserStore } from '@/store/user';
 
 const router = useRouter();
+const user = useUserStore();
 
 const isLogin = ref(true);
 const username = ref("");
@@ -42,12 +44,10 @@ const handleLogin = async() => {
 
     const info = res.data.data;
 
-    localStorage.setItem("userId", info.userId);
-    localStorage.setItem("username", info.username);
+    user.setUserInfo(info);
+
     localStorage.setItem("token", info.token);
     localStorage.setItem("token_exp", info.expiration);
-    localStorage.setItem("roles", info.roles);
-    localStorage.setItem("perms", info.perms);
 
     router.push("/");
   } catch (e) {

@@ -38,16 +38,19 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 import dayjs from 'dayjs';
+import { useUserStore } from '@/store/user';
 
-const userId = ref(localStorage.getItem('userId'));
-const username = ref(localStorage.getItem('username'));
+const user = useUserStore();
+
+const userId = ref(user.userId);
+const username = ref(user.username);
 const token = ref(localStorage.getItem('token'));
 const tokenExp = ref(localStorage.getItem('token_exp'));
 
-const rArr = (localStorage.getItem('roles') || '').split(',');
+const rArr = user.roles || [];
 const roles = ref(rArr);
 
-const pArr = (localStorage.getItem('perms') || '').split(',');
+const pArr = user.perms || [];
 const perms = ref(pArr);
 
 

@@ -103,6 +103,10 @@ onBeforeUnmount(() => {
 // -------------------------- 用户 start --------------------------
 import router from '@/router';
 import { ElMessage, ElMessageBox } from 'element-plus';
+import { useUserStore } from '@/store/user.ts';
+
+const user = useUserStore();
+
 const jumpToProfile = () => {
   router.replace("/user/profile").catch(() => { });
 };
@@ -116,8 +120,9 @@ const logout = () => {
 
     localStorage.removeItem("token");
     localStorage.removeItem("token_exp");
-    localStorage.removeItem("userId");
-    localStorage.removeItem("username");
+    
+    user.clearUserInfo();
+
     router.replace('/lr').catch(() => { });
     ElMessage.success("退出登录");
 
