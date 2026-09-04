@@ -1,62 +1,60 @@
 <template>
-  <div>
-    <el-table :data="users" style="width: 100%">
-      <el-table-column prop="roleName" label="角色名" show-overflow-tooltip :width="layoutStore.isMobile ? 100 : undefined"></el-table-column>
-      <el-table-column prop="roleCode" label="角色码" align="center" :width="layoutStore.isMobile ? 100 : undefined">
-        <template #default="scope">
-          <el-tag :type="scope.row.roleCode === 'ROLE_ADMIN' ? 'success' : 'primary'">{{ scope.row.roleCode }}</el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column prop="createTime" label="创建时间" align="center"
-        :formatter="(_: any, __: any, c: any) => dayjs(c).format('YYYY-MM-DD HH:mm:ss')"></el-table-column>
-    </el-table>
+  <div class="role_wrapper">
 
-    <div class="flex_center" style="margin-top: 16px;">
-      <el-pagination v-model:current-page="pageNum" v-model:page-size="pageSize" :page-sizes="[10, 20, 30, 40]"
-        layout="total, sizes, prev, pager, next" :total="total" @size-change="handleSizeChange"
-        @current-change="handleCurrentChange" size="small" />
-    </div>
+    <ComTable ref="comTableRef" :real-data="roles" @refresh="loadTableData">
+
+      <!-- 1. 查询条件 -->
+      <template #conditions></template>
+
+      <!-- 2. 按钮组 -->
+      <template #ops></template>
+
+      <!-- 3. 表格列 -->
+      <template #columns>
+        <el-table-column prop="roleName" label="角色名" show-overflow-tooltip
+          :width="layoutStore.isMobile ? 100 : undefined"></el-table-column>
+        <el-table-column prop="roleCode" label="角色码" align="center" :width="layoutStore.isMobile ? 100 : undefined">
+          <template #default="scope">
+            <el-tag :type="scope.row.roleCode === 'ROLE_ADMIN' ? 'success' : 'primary'">{{ scope.row.roleCode
+              }}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="createTime" label="创建时间" align="center"
+          :formatter="(_: any, __: any, c: any) => dayjs(c).format('YYYY-MM-DD HH:mm:ss')"></el-table-column>
+      </template>
+
+    </ComTable>
+
   </div>
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref } from 'vue';
+import { ref } from 'vue';
 import type { SysRole } from '@/types/modules/role';
 import { getRoles } from '@/api/system/role';
 import dayjs from 'dayjs';
 import { useLayoutStore } from '@/store/layout';
-
+import ComTable from '@/components/ComTable.vue';
 
 const layoutStore = useLayoutStore();
 
-const pageNum = ref(1);
-const pageSize = ref(10);
-
-const users = ref<SysRole[]>([]);
-const total = ref(0);
+const roles = ref<SysRole[]>([]);
+const comTableRef = ref<InstanceType<typeof ComTable> | null>(null);
 
 const loadTableData = async () => {
   try {
     const res = await getRoles({
-      pageNum: pageNum.value,
-      pageSize: pageSize.value
+      pageNum: comTableRef?.value?.currentPage,
+      pageSize: comTableRef?.value?.pageSize
     });
-    users.value = res.data.data.records;
-    total.value = res.data.data.total;
+    roles.value = res.data.data.records;
+    comTableRef.value && (comTableRef.value.total = res.data.data.total);
   } catch (e) { }
 }
-
-const handleCurrentChange = () => {
-  loadTableData();
-};
-
-const handleSizeChange = () => {
-  pageNum.value = 1;
-  loadTableData();
-};
-
-onMounted(() => {
-  loadTableData();
-})
-
 </script>
+
+<style lang="scss" scoped>
+.role_wrapper {
+  height: 100%;
+}
+</style>
