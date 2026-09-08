@@ -51,7 +51,7 @@ const sidebarRoutes = [
   },
   {
     path: '/sys',
-    meta: { title: '系统管理', icon: Icons['Tools'] },
+    meta: { title: '系统管理', icon: Icons['Tools'], hidden: 'check' },
     children: [
       {
         path: 'users',

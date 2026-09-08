@@ -16,7 +16,7 @@
 
           <div v-for="item in sidebarRoutes" :key="item.path">
 
-            <div v-if="!item.meta.hidden">
+            <div v-if="menuShow(item.meta.hidden)">
 
               <el-sub-menu :index="item.path" v-if="item?.children && item.children.length > 0">
                 <template #title>
@@ -58,6 +58,7 @@
 import { ref } from 'vue';
 import { sidebarRoutes } from '@/router';
 import { useLayoutStore } from '@/store/layout';
+import { useUserStore } from '@/store/user';
 
 const openeds = ref(['/mine', '/user', '/sys']);
 
@@ -65,6 +66,14 @@ const openeds = ref(['/mine', '/user', '/sys']);
 const layoutStore = useLayoutStore();
 // -------------------------- Sidebar切换 end  --------------------------
 
+const user = useUserStore();
+const menuShow = (hidden: boolean | string | undefined) => {
+  if(hidden === undefined || hidden === false) return true;
+  else if(hidden === true) return false;
+  else if(hidden === 'check') {
+    return user.roles.includes('ROLE_ADMIN');
+  }
+}
 </script>
 
 <style lang="scss" scoped>
