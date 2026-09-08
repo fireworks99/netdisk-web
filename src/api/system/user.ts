@@ -22,3 +22,9 @@ export function getUsers(params: {}) {
     params
   })
 }
+
+export function getCurrent() {
+  return request({
+    url: '/user/current'
+  })
+}
