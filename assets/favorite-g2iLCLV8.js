@@ -1,0 +1,1 @@
+import{B as e}from"./index-MC1vnNtS.js";function o(r){return e({url:"/favorite/page",params:r})}function a(r){return e({url:`/favorite/${r}`,method:"post"})}function i(r){return e({url:`/favorite/${r}`,method:"delete"})}export{o as g,i as r,a as s};
